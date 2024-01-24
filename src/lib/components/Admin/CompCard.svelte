@@ -1,5 +1,5 @@
 <script>
-// @ts-nocheck
+	// @ts-nocheck
 
 	import { CodeBlock } from '@skeletonlabs/skeleton';
 	import hljs from 'highlight.js/lib/core';
@@ -66,31 +66,75 @@
 	hljs.registerLanguage('yaml', yaml);
 
 	storeHighlightJs.set(hljs);
-
 	/**
 	 * @type {{ content: string; }}
 	 */
 	export let message; // your message object
 
-	/**
-	 * @type {any[]}
-	 */
 	let parts = [];
 
-	// Split message content by code block
-	$: {
-		const codeRegex = /(```\w*[\s\S]*?```)/gs;
-		parts = message.content.split(codeRegex).map((part) => {
-			const match = /```(\w*)\s*([\s\S]*)```/.exec(part);
-			return match ? { language: match[1] || 'ts', code: match[2] } : { text: part };
-		});
-	}
+	// Split message content by code block and inline code
+    $: {
+        const codeRegex = /(```[\w\s\S]*?```)|(`[^`]*`)/gs;
+        parts = message.content.split(codeRegex).map((part) => {
+            if (!part) return { text: '' };
+            const blockMatch = /```(\w*)\s*([\s\S]*)```/.exec(part);
+            const inlineMatch = /`([^`]*)`/.exec(part);
+            if (blockMatch) {
+                return { language: blockMatch[1] || 'ts', code: blockMatch[2] };
+            } else if (inlineMatch) {
+                return { inlineCode: inlineMatch[1] };
+            } else {
+                return { text: part };
+            }
+        });
+    }
 </script>
 
 {#each parts as part (part)}
 	{#if part.code}
 		<CodeBlock language={part.language} code={part.code}></CodeBlock>
+	{:else if part.inlineCode}
+		<span class="px-0.5 bg-green-500 bg-opacity-20 text-green-400">{part.inlineCode}</span>
 	{:else}
 		{part.text}
 	{/if}
 {/each}
+
+<!-- // 	/**
+// 	 * @type {{ content: string; }}
+// 	 */
+// 	export let message; // your message object
+
+// 	/**
+// 	 * @type {any[]}
+// 	 */
+// 	let parts = [];
+
+// 	// Split message content by code block
+// 	$: {
+// 		const codeRegex = /(```\w*[\s\S]*?```)/gs;
+// 		parts = message.content.split(codeRegex).map((part) => {
+// 			const match = /```(\w*)\s*([\s\S]*)```/.exec(part);
+// 			return match ? { language: match[1] || 'ts', code: match[2] } : { text: part };
+// 		});
+// 	}
+// </script>
+
+// {#each parts as part (part)}
+// 	{#if part.code}
+// 		<CodeBlock language={part.language} code={part.code}></CodeBlock>
+// 	{:else}
+// 		{part.text}
+// 	{/if}
+// {/each} -->
+
+<style>
+	.inline-code {
+		background-color: black;
+		color: white;
+		padding: 2px 5px;
+		border-radius: 3px;
+		font-family: monospace;
+	}
+</style>
