@@ -28,6 +28,11 @@
 	 */
 	let data = [];
 
+	/**
+	 * @type {{ role: any; content: any; }[]}
+	 */
+	let messageHistory = [];
+
 	const app = initializeApp(firebaseConfig);
 	// @ts-ignore
 	const firestore = getFirestore(app);
@@ -40,7 +45,15 @@
 		const collectionRef = collection(firestore, `chats/${userId}/MyAiChats`);
 		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'asc')));
 		data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+		querySnapshot.docs.forEach((doc) => {
+			messageHistory.push({
+				role: doc.data().role,
+				content: doc.data().content
+			});
+		});
 	}
+
+	// console.log(messageHistory);
 
 	onMount(() => {
 		fetchData();
@@ -49,7 +62,8 @@
 	const { messages, handleSubmit, input } = useChat({
 		api: 'http://localhost:5173/main/chats',
 		body: {
-			userId: userId
+			userId: userId,
+            messageHistory: messageHistory,
 		},
 		initialMessages: data
 	});
@@ -88,7 +102,7 @@
 </div>
 
 <form on:submit={handleSubmit}>
-	<div class="flex justify-center p-6">
+	<div class="flex justify-center pt-2 pb-6">
 		<div
 			class="flex items-center justify-center px-2 bg-white border sm:w-full lg:w-1/2 border-slate-700 rounded-xl bg-opacity-5"
 		>

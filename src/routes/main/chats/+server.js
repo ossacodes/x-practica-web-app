@@ -11,16 +11,19 @@ const openai = new OpenAI({
 // @ts-ignore
 export const POST = async ({ request }) => {
 	// Extract the `prompt` from the body of the request
-	const { messages, userId } = await request.json();
-	// const prompt = messages.map();
+	const { messages, userId, messageHistory } = await request.json();
 
-	//    const data = await request.json();
+	// console.log('messages History ', messageHistory);
+	// console.log('messages ', messages);
+
+	// Combine messageHistory and messages
+	const combinedMessages = messageHistory.concat(messages);
 
 	// Ask OpenAI for a streaming chat completion given the prompt
 	const response = await openai.chat.completions.create({
 		model: 'gpt-3.5-turbo',
 		stream: true,
-		messages: messages.map((/** @type {{ content: any; role: any; }} */ message) => ({
+		messages: combinedMessages.map((/** @type {{ content: any; role: any; }} */ message) => ({
 			content: message.content,
 			role: message.role
 		}))
@@ -35,15 +38,15 @@ export const POST = async ({ request }) => {
 				content: messages[messages.length - 1].content,
 				role: 'user',
 				timestamp: Date.now(),
-                date: new Date(),
+				date: new Date()
 			});
 		},
 		onCompletion: async (completion) => {
 			await chatsDocRef.add({
 				content: completion,
-				role: 'bot',
+				role: 'assistant',
 				timestamp: Date.now(),
-                date: new Date(),
+				date: new Date()
 			});
 		}
 	});
