@@ -4,6 +4,8 @@
 	import Hero from '$lib/components/Hero.svelte';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Pricing from '$lib/components/Pricing.svelte';
+
+
 </script>
 
 <div>

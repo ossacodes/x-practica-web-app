@@ -20,6 +20,9 @@
 	import { goto } from '$app/navigation';
 	import 'remixicon/fonts/remixicon.css';
 	import PromptTextField from '$lib/components/Admin/PromptTextField.svelte';
+	import { getContext, setContext } from 'svelte';
+	import { writable } from 'svelte/store';
+	import { currentUserId } from '$lib/userState';
 
 	initializeStores();
 
@@ -31,9 +34,12 @@
 	const auth = getAuth(app);
 
 	const user = userStore(auth);
-	// if ($user?.uid == null) {
-	// 	goto('/');
-	// }
+
+	setContext('user', user);
+	
+	if ($user?.uid != null) {
+		console.log($user?.uid);
+	}
 	let currentMessage = '';
 </script>
 
@@ -56,7 +62,7 @@
 			<!-- ---- / ---- -->
 			<!-- <svelte:fragment slot="pageFooter"> -->
 
-				<!-- <div
+			<!-- <div
 					class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token"
 				>
 					<button class="input-group-shim">+</button>

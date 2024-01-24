@@ -1,4 +1,4 @@
-<script lang="ts">
+<script >
 	import { auth } from '$lib/firebase/firebase.client';
 	import { createUserWithEmailAndPassword } from 'firebase/auth';
 	import { userStore } from 'sveltefire';

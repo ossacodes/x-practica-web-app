@@ -1,46 +1,142 @@
-<div class="flex justify-center p-6">
-	<div class="flex items-center justify-center px-2 bg-white border sm:w-full lg:w-1/2 border-slate-700 rounded-xl bg-opacity-5">
-		<svg
-			class="m-3"
-			width="30"
-			height="30"
-			viewBox="0 0 35 35"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
-				d="M19.4588 9.5427L21.5369 11.5892L12.3229 20.9455C11.8605 21.4174 11.8605 22.1769 12.3229 22.6488C12.7616 23.0966 13.4945 23.0946 13.9286 22.6463L24.066 12.3481C25.5459 10.8379 25.5459 8.41233 24.066 6.90204C22.654 5.46107 20.1556 5.49312 18.7718 6.90479L7.70695 18.1371C5.20882 20.6854 5.20882 24.7775 7.70695 27.3258C10.1328 29.8003 14.2999 29.76 16.6878 27.3235L29.5926 14.2171L31.671 16.2635L18.7685 29.3674C15.2483 32.9594 9.20252 33.0178 5.62414 29.3676C2.01419 25.6851 2.0142 19.7778 5.62663 16.0928L16.6914 4.86048C19.2048 2.29663 23.5817 2.24047 26.1492 4.86069C28.7404 7.50503 28.7404 11.7452 26.1469 14.3919L16.0155 24.6838C14.4483 26.3025 11.8264 26.3098 10.2395 24.69C8.66609 23.0841 8.66609 20.5102 10.2421 18.9017L19.4588 9.5427Z"
-				fill="white"
-			/>
-		</svg>
+<script>
+	import { useChat } from 'ai/svelte';
+	// @ts-ignore
+	// @ts-ignore
+	import { getContext, onMount } from 'svelte';
+	// @ts-ignore
+	// @ts-ignore
+	import { writable } from 'svelte/store';
+	// @ts-ignore
+	// @ts-ignore
+	import { currentUserId } from '$lib/userState';
+	// @ts-ignore
+	import firebaseConfig, { db } from '$lib/firebase/firebase.client';
+	import { initializeApp } from 'firebase/app';
+	import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
+	import CompCard from './CompCard.svelte';
 
-		<input
-			class="w-full h-12 bg-transparent border-0 border-none placeholder:text-lg focus:ring-0"
-			title="Input (text)"
-			type="text"
-			placeholder="Send a message..."
-		/>
-		<svg
-			class="m-3"
-			width="30"
-			height="30"
-			viewBox="0 0 31 30"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path
-				d="M29.2482 1.75998C28.519 1.01477 27.4398 0.739145 26.4336 1.03081L2.96899 7.8106C1.90733 8.10519 1.15482 8.94664 0.952117 10.0141C0.745033 11.1021 1.46837 12.4846 2.41337 13.0621L9.75024 17.5421C10.5027 18.0029 11.474 17.8877 12.0967 17.2635L20.4982 8.86206C20.9211 8.4231 21.6211 8.4231 22.044 8.86206C22.4669 9.28352 22.4669 9.97039 22.044 10.4079L13.628 18.8094C13.0038 19.4335 12.8871 20.4019 13.3465 21.1558L17.8294 28.5204C18.3544 29.3939 19.2586 29.8912 20.2502 29.8912C20.3669 29.8912 20.4982 29.8912 20.6148 29.8752C21.7523 29.7308 22.6565 28.9564 22.9919 27.8627L29.9482 4.57456C30.2544 3.58289 29.9773 2.50373 29.2482 1.75998"
-				fill="white"
-			/>
-			<path
-				opacity="0.4"
-				fill-rule="evenodd"
-				clip-rule="evenodd"
-				d="M2.39026 22.5114C2.11026 22.5114 1.83026 22.4049 1.61734 22.1905C1.19005 21.7633 1.19005 21.072 1.61734 20.6447L3.60797 18.6526C4.03526 18.2268 4.72797 18.2268 5.15526 18.6526C5.58109 19.0799 5.58109 19.7726 5.15526 20.1999L3.16318 22.1905C2.95026 22.4049 2.67026 22.5114 2.39026 22.5114ZM7.87534 24.2503C7.59534 24.2503 7.31534 24.1438 7.10243 23.9295C6.67514 23.5022 6.67514 22.8109 7.10243 22.3836L9.09305 20.3915C9.52034 19.9657 10.2131 19.9657 10.6403 20.3915C11.0662 20.8188 11.0662 21.5115 10.6403 21.9388L8.64826 23.9295C8.43534 24.1438 8.15534 24.2503 7.87534 24.2503ZM8.24532 29.4536C8.45824 29.668 8.73824 29.7745 9.01824 29.7745C9.29824 29.7745 9.57824 29.668 9.79116 29.4536L11.7832 27.463C12.2091 27.0357 12.2091 26.343 11.7832 25.9157C11.3559 25.4899 10.6632 25.4899 10.2359 25.9157L8.24532 27.9078C7.81803 28.3351 7.81803 29.0263 8.24532 29.4536Z"
-				fill="white"
-			/>
-		</svg>
+	/**
+	 * @type {string}
+	 */
+	// @ts-ignore
+	export let userId;
+
+	// console.log(userId);
+
+	/**
+	 * @type {string | any[]}
+	 */
+	let data = [];
+
+	const app = initializeApp(firebaseConfig);
+	// @ts-ignore
+	const firestore = getFirestore(app);
+
+	// Fetch data from a Firestore collection
+	async function fetchData() {
+		// const snapshot = await db.collection('chats').doc(userId).collection('MyAiChats').get();
+		// const data = snapshot.docs.map((doc) => doc.data());
+		// @ts-ignore
+		const collectionRef = collection(firestore, `chats/${userId}/MyAiChats`);
+		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'asc')));
+		data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+	}
+
+	onMount(() => {
+		fetchData();
+	});
+
+	const { messages, handleSubmit, input } = useChat({
+		api: 'http://localhost:5173/main/chats',
+		body: {
+			userId: userId
+		},
+		initialMessages: data
+	});
+</script>
+
+<div class="flex flex-col-reverse items-center justify-start flex-1 overflow-y-auto">
+	<div class="flex flex-col space-y-4 justify-cemter sm:w-full lg:w-1/2">
+		{#if data.length > 0}
+			<ul>
+				{#each data as message}
+					<div class={`flex mt-5 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+						<div
+							class={`p-2 max-w-lg rounded-lg ${message.role === 'user' ? 'bg-blue-800 bg-opacity-30 text-white' : 'bg-gray-200 bg-opacity-5 text-gray'}`}
+						>
+							<CompCard {message} />
+						</div>
+					</div>
+				{/each}
+			</ul>
+		{:else}
+			<div></div>
+		{/if}
+
+		{#if $messages.length > 0}
+			{#each $messages as message}
+				<div class={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+					<div
+						class={`p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-800 bg-opacity-30 text-white' : 'bg-gray-200 bg-opacity-5 text-gray'}`}
+					>
+						<CompCard {message} />
+					</div>
+				</div>
+			{/each}
+		{/if}
 	</div>
 </div>
+
+<form on:submit={handleSubmit}>
+	<div class="flex justify-center p-6">
+		<div
+			class="flex items-center justify-center px-2 bg-white border sm:w-full lg:w-1/2 border-slate-700 rounded-xl bg-opacity-5"
+		>
+			<svg
+				class="m-3"
+				width="30"
+				height="30"
+				viewBox="0 0 35 35"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					fill-rule="evenodd"
+					clip-rule="evenodd"
+					d="M19.4588 9.5427L21.5369 11.5892L12.3229 20.9455C11.8605 21.4174 11.8605 22.1769 12.3229 22.6488C12.7616 23.0966 13.4945 23.0946 13.9286 22.6463L24.066 12.3481C25.5459 10.8379 25.5459 8.41233 24.066 6.90204C22.654 5.46107 20.1556 5.49312 18.7718 6.90479L7.70695 18.1371C5.20882 20.6854 5.20882 24.7775 7.70695 27.3258C10.1328 29.8003 14.2999 29.76 16.6878 27.3235L29.5926 14.2171L31.671 16.2635L18.7685 29.3674C15.2483 32.9594 9.20252 33.0178 5.62414 29.3676C2.01419 25.6851 2.0142 19.7778 5.62663 16.0928L16.6914 4.86048C19.2048 2.29663 23.5817 2.24047 26.1492 4.86069C28.7404 7.50503 28.7404 11.7452 26.1469 14.3919L16.0155 24.6838C14.4483 26.3025 11.8264 26.3098 10.2395 24.69C8.66609 23.0841 8.66609 20.5102 10.2421 18.9017L19.4588 9.5427Z"
+					fill="white"
+				/>
+			</svg>
+
+			<input
+				class="w-full h-12 bg-transparent border-0 border-none placeholder:text-lg focus:ring-0"
+				title="Input (text)"
+				type="text"
+				placeholder="Send a message..."
+				bind:value={$input}
+			/>
+			<button type="submit">
+				<svg
+					class="m-3"
+					width="30"
+					height="30"
+					viewBox="0 0 31 30"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M29.2482 1.75998C28.519 1.01477 27.4398 0.739145 26.4336 1.03081L2.96899 7.8106C1.90733 8.10519 1.15482 8.94664 0.952117 10.0141C0.745033 11.1021 1.46837 12.4846 2.41337 13.0621L9.75024 17.5421C10.5027 18.0029 11.474 17.8877 12.0967 17.2635L20.4982 8.86206C20.9211 8.4231 21.6211 8.4231 22.044 8.86206C22.4669 9.28352 22.4669 9.97039 22.044 10.4079L13.628 18.8094C13.0038 19.4335 12.8871 20.4019 13.3465 21.1558L17.8294 28.5204C18.3544 29.3939 19.2586 29.8912 20.2502 29.8912C20.3669 29.8912 20.4982 29.8912 20.6148 29.8752C21.7523 29.7308 22.6565 28.9564 22.9919 27.8627L29.9482 4.57456C30.2544 3.58289 29.9773 2.50373 29.2482 1.75998"
+						fill="white"
+					/>
+					<path
+						opacity="0.4"
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M2.39026 22.5114C2.11026 22.5114 1.83026 22.4049 1.61734 22.1905C1.19005 21.7633 1.19005 21.072 1.61734 20.6447L3.60797 18.6526C4.03526 18.2268 4.72797 18.2268 5.15526 18.6526C5.58109 19.0799 5.58109 19.7726 5.15526 20.1999L3.16318 22.1905C2.95026 22.4049 2.67026 22.5114 2.39026 22.5114ZM7.87534 24.2503C7.59534 24.2503 7.31534 24.1438 7.10243 23.9295C6.67514 23.5022 6.67514 22.8109 7.10243 22.3836L9.09305 20.3915C9.52034 19.9657 10.2131 19.9657 10.6403 20.3915C11.0662 20.8188 11.0662 21.5115 10.6403 21.9388L8.64826 23.9295C8.43534 24.1438 8.15534 24.2503 7.87534 24.2503ZM8.24532 29.4536C8.45824 29.668 8.73824 29.7745 9.01824 29.7745C9.29824 29.7745 9.57824 29.668 9.79116 29.4536L11.7832 27.463C12.2091 27.0357 12.2091 26.343 11.7832 25.9157C11.3559 25.4899 10.6632 25.4899 10.2359 25.9157L8.24532 27.9078C7.81803 28.3351 7.81803 29.0263 8.24532 29.4536Z"
+						fill="white"
+					/>
+				</svg>
+			</button>
+		</div>
+	</div>
+</form>
