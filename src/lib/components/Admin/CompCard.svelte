@@ -128,13 +128,3 @@
 // 		{part.text}
 // 	{/if}
 // {/each} -->
-
-<style>
-	.inline-code {
-		background-color: black;
-		color: white;
-		padding: 2px 5px;
-		border-radius: 3px;
-		font-family: monospace;
-	}
-</style>

@@ -2,7 +2,24 @@
 	import { goto } from '$app/navigation';
 	import { ListBox, ListBoxItem } from '@skeletonlabs/skeleton';
 	import SearchTextField from './SearchTextField.svelte';
+	import { initializeApp } from 'firebase/app';
+	import {
+		getFirestore,
+		collection,
+		setDoc,
+		doc,
+		getDocs,
+		query,
+		orderBy,
+		where
+	} from 'firebase/firestore';
+	import firebaseConfig from '$lib/firebase/firebase.client';
+	import { Collection } from 'sveltefire';
+	import { onMount } from 'svelte';
 	let valueSingle: string = 'dashboard';
+
+	export let userId: any;
+
 	let navItems = [
 		{
 			name: 'Python Code to C++',
@@ -27,8 +44,48 @@
 		// Add more items as needed...
 	];
 
-	function addChat() {
-		console.log('Add Chat');
+	// const chatsDocRef = db.collection('chats').doc(userId).collection('MyAiChats');
+	const app = initializeApp(firebaseConfig);
+	const firestore = getFirestore(app);
+	let searchValue = '';
+	let chats: any = [];
+
+	async function getNavData() {
+		const collectionRef = collection(firestore, `MyChats/${userId}/RoleChats/`);
+		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'asc')));
+		querySnapshot.docs.forEach((doc) => {
+			chats.push({
+				id: doc.id,
+				title: doc.data().title,
+				subTitle: doc.data().subTitle,
+				timestamp: doc.data().timestamp,
+				time: doc.data().time
+			});
+			// console.log(doc.data());
+		});
+	}
+
+	onMount(() => {
+		getNavData();
+	});
+
+	function find(items: any, searchText: any) {
+		searchText = searchText.toLowerCase().split(' ');
+		return items.filter((item: any) => {
+			return searchText.every((el: any) => {
+				return item.title.toLowerCase().includes(el) || item.subTitle.toLowerCase().includes(el);
+			});
+		});
+	}
+
+	async function addChat() {
+		await setDoc(doc(firestore, `MyChats/${userId}/RoleChats/${Date.now()}`), {
+			title: 'New Chat',
+			subTitle: 'Use any prompts to get started',
+			timestamp: Date.now(),
+			time: new Date()
+		});
+		console.log('Added Chat');
 	}
 </script>
 
@@ -65,49 +122,83 @@
 			</button>
 		</div>
 		<div class="h-3"></div>
-		<SearchTextField />
-		<div class="h-3"></div>
-		{#each navItems as item (item.value)}
-			<div class="flex items-center p-4 bg-white rounded-lg shadow bg-opacity-5">
-				<!-- Lead: Avatar -->
-				<div class="flex-shrink-0">
-					<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
-					{@html item.icon}
-				</div>
-
-				<!-- Title and Subtitle -->
-				<div class="w-32 ml-4">
-					<div class="text-sm font-semibold truncate">{item.name}</div>
-					<div class="overflow-hidden text-sm text-gray-500 truncate">
-						Lorem, ipsum dolor sit amet consectetur adipisicing elit. Adipisci similique animi
-						numquam hic sapiente ab nemo aspernatur blanditiis? Omnis corrupti aliquam ea at, quae
-						commodi quasi dolores molestias porro quia.
-					</div>
-				</div>
-
-				<!-- Trailing: Time -->
-				<div class="ml-auto text-sm text-gray-500">3 min ago</div>
-			</div>
-			<!-- <ListBoxItem
-				bind:group={valueSingle}
-				on:change={() => {
-					if (valueSingle === 'dashboard') {
-						goto('/main/chats');
-					} else if (valueSingle === 'posts') {
-						goto('/main/chats/Posts');
-					} else if (valueSingle === 'analytics') {
-						goto('/User/Analytics');
-					} else if (valueSingle === 'settings') {
-						goto('/main/chats/Settings');
-					}
-				}}
-				name="medium"
-				value={item.value}
+		<!-- Search Bar -->
+		<div class="flex justify-center p-2">
+			<div
+				class="flex items-center justify-center w-full pl-3 bg-white border border-slate-700 rounded-xl bg-opacity-5"
 			>
-				<svelte:fragment slot="lead">
-					{@html item.icon}
-				</svelte:fragment>{item.name}
-			</ListBoxItem> -->
-		{/each}
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 14 15"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M1.1665 6.72414C1.1665 3.93099 3.4067 1.66669 6.17013 1.66669C7.49717 1.66669 8.76986 2.19952 9.70822 3.14798C10.6466 4.09644 11.1737 5.38282 11.1737 6.72414C11.1737 9.5173 8.93355 11.7816 6.17013 11.7816C3.4067 11.7816 1.1665 9.5173 1.1665 6.72414ZM11.091 10.7984L12.5812 12.0013H12.6071C12.9085 12.306 12.9085 12.8001 12.6071 13.1048C12.3056 13.4095 11.8167 13.4095 11.5153 13.1048L10.2786 11.6875C10.1617 11.5697 10.096 11.4097 10.096 11.2429C10.096 11.0761 10.1617 10.9161 10.2786 10.7984C10.5041 10.5744 10.8655 10.5744 11.091 10.7984Z"
+						fill="#E7E7E7"
+						fill-opacity="0.5"
+					/>
+				</svg>
+
+				<input
+					class="w-full bg-transparent border-0 border-none placeholder:text-sm focus:ring-0"
+					title="Input (text)"
+					type="text"
+					placeholder="Search..."
+					bind:value={searchValue}
+				/>
+			</div>
+		</div>
+		<div class="h-3"></div>
+		{#if searchValue === ''}
+			<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
+				{#each data as item (item.id)}
+					<div class="flex items-center p-4 bg-white rounded-lg shadow bg-opacity-5">
+						<!-- Lead: Avatar -->
+						<div class="flex-shrink-0">
+							<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
+							<!-- {@html item.icon} -->
+							<i class="ri-code-s-slash-line"></i>
+						</div>
+
+						<!-- Title and Subtitle -->
+						<div class="w-32 ml-4">
+							<div class="text-sm font-semibold truncate">{item.title}</div>
+							<div class="overflow-hidden text-sm text-gray-500 truncate">
+								{item.subTitle}
+							</div>
+						</div>
+
+						<!-- Trailing: Time -->
+						<div class="ml-auto text-sm text-gray-500">3 min ago</div>
+					</div>
+				{/each}
+			</Collection>
+		{:else}
+			{#each find(chats, searchValue) as item (item.id)}
+				<div class="flex items-center p-4 bg-white rounded-lg shadow bg-opacity-5">
+					<!-- Lead: Avatar -->
+					<div class="flex-shrink-0">
+						<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
+						<!-- {@html item.icon} -->
+						<i class="ri-code-s-slash-line"></i>
+					</div>
+
+					<!-- Title and Subtitle -->
+					<div class="w-32 ml-4">
+						<div class="text-sm font-semibold truncate">{item.title}</div>
+						<div class="overflow-hidden text-sm text-gray-500 truncate">
+							{item.subTitle}
+						</div>
+					</div>
+
+					<!-- Trailing: Time -->
+					<div class="ml-auto text-sm text-gray-500">3 min ago</div>
+				</div>
+			{/each}
+		{/if}
 	</ListBox>
 </nav>

@@ -35,11 +35,11 @@
 
 	const user = userStore(auth);
 
-	setContext('user', user);
+	// setContext('user', user);
 	
-	if ($user?.uid != null) {
-		console.log($user?.uid);
-	}
+	// if ($user?.uid != null) {
+	// 	console.log($user?.uid);
+	// }
 	let currentMessage = '';
 </script>
 
@@ -52,7 +52,7 @@
 				<Appbar />
 			</svelte:fragment> -->
 			<svelte:fragment slot="sidebarLeft">
-				<Navigation />
+				<Navigation userId={$user?.uid} />
 			</svelte:fragment>
 			<!-- Router Slot -->
 			<div class="w-full p-0">

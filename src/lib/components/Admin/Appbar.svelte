@@ -13,6 +13,8 @@
 	import { SignedIn } from 'sveltefire';
 	import { goto } from '$app/navigation';
 
+	export let userId: any;
+
 	initializeStores();
 
 	const drawerStore = getDrawerStore();
@@ -32,7 +34,7 @@
 </script>
 
 <Drawer width="w-52">
-	<Navigation />
+	<Navigation userId={userId}/>
 </Drawer>
 
 <AppBar
