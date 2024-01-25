@@ -63,14 +63,62 @@
 		api: 'http://localhost:5173/main/chats',
 		body: {
 			userId: userId,
-            messageHistory: messageHistory,
+			messageHistory: messageHistory
 		},
 		initialMessages: data
 	});
+
+	let isDragging = false;
+
+	/**
+	 * @param {{ preventDefault: () => void; }} event
+	 */
+	function onDragOver(event) {
+		event.preventDefault(); // Necessary to allow dropping
+		isDragging = true;
+	}
+	/**
+	 * @param {{ preventDefault: () => void; }} event
+	 */
+	function onDragLeave(event) {
+		isDragging = false;
+	}
+	/**
+	 * @param {{ preventDefault: () => void; }} event
+	 */
+	function onDrop(event) {
+		event.preventDefault();
+		isDragging = false;
+
+		// Access the files from the drop event
+		// @ts-ignore
+		const files = event.dataTransfer.files;
+		if (files.length > 0) {
+			// Handle the files, for example, uploading or reading file content
+			console.log('Dropped files:', files);
+		}
+	}
 </script>
 
-<div class="flex flex-col-reverse items-center justify-start flex-1 overflow-y-auto">
-	<div class="flex flex-col space-y-4 justify-cemter sm:w-full lg:w-1/2">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div
+	class:highlight={isDragging}
+	on:dragover={onDragOver}
+	on:dragleave={onDragLeave}
+	on:drop={onDrop}
+	class="flex flex-col-reverse items-center justify-start flex-1 overflow-y-auto "
+>
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	{#if isDragging}
+		<div
+			class="border-2 border-gray-400 border-dashed rounded-lg sm:w-full lg:w-1/2 h-52"
+		>
+			Drop files here
+		</div>
+	{/if}
+	<div class={`${isDragging === true ? 'pointer-events-none' : ''} flex flex-col justify-center space-y-4  sm:w-full lg:w-1/2`}>
 		{#if data.length > 0}
 			<ul>
 				{#each data as message}
@@ -154,3 +202,10 @@
 		</div>
 	</div>
 </form>
+
+<style>
+	.highlight {
+		background-color: #f0f0f0; /* Highlight color when dragging files over */
+        opacity: 0.1;
+	}
+</style>

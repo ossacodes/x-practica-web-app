@@ -6,6 +6,8 @@
 		getDrawerStore,
 		initializeStores,
 		LightSwitch,
+		ListBox,
+		ListBoxItem,
 		popup,
 		type PopupSettings
 	} from '@skeletonlabs/skeleton';
@@ -31,10 +33,18 @@
 		// Defines which side of your trigger the popup will appear
 		placement: 'left'
 	};
+
+	let comboboxValue: string;
+	const popupCombobox: PopupSettings = {
+		event: 'click',
+		target: 'popupCombobox',
+		placement: 'bottom',
+		closeQuery: '.listbox-item'
+	};
 </script>
 
 <Drawer width="w-52">
-	<Navigation userId={userId}/>
+	<Navigation {userId} />
 </Drawer>
 
 <AppBar
@@ -64,6 +74,25 @@
 				>
 			</span>
 		</button>
+
+		<div class="pl-3">
+			<button  class="justify-between w-48" use:popup={popupCombobox}>
+				<span class="pr-3 capitalize">{comboboxValue ?? 'GPT-3.5-Turbo'}</span>
+				<span>↓</span>
+			</button>
+		</div>
+
+		<!-- Drop down data -->
+		<div class="w-48 py-2 shadow-xl card" data-popup="popupCombobox">
+			<ListBox rounded="rounded-none">
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="GPT-4">GPT-4</ListBoxItem>
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="GPT-3.5-Turbo">GPT-3.5-Turbo</ListBoxItem>
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="Mixtral MoE 8x7B">Mixtral MoE 8x7B</ListBoxItem>
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="Llama 2 70B Chat">Llama 2 70B Chat</ListBoxItem>
+			</ListBox>
+			<div class="arrow bg-surface-100-800-token" />
+		</div>
+
 		<!-- <span class="hidden text-2xl font-bold md:inline-block">App</span> -->
 	</svelte:fragment>
 	<div class="flex items-center flex-shrink-0 px-20 text-white">
