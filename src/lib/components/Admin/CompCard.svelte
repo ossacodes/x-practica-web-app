@@ -66,6 +66,38 @@
 	hljs.registerLanguage('yaml', yaml);
 
 	storeHighlightJs.set(hljs);
+
+	// Define the regex for headings, paragraphs, and list items.
+	const headingRegex = /^(.*?):\s/gm;
+	const paragraphRegex = /(\n|^)(.*?)(?=\n|$)/g;
+	const listItemRegex = /(\d+\.\s)(.*?)(?=\d+\.\s|$)/g;
+	const newLineRegex = /\n/g;
+
+	// Function to apply the regex and return formatted HTML.
+	const formatText = (inputText) => {
+		// Format headings with extra break for spacing
+		let formattedText = inputText.replace(headingRegex, '<h2 style="text-align: left;">$1:</h2>');
+
+		// Format paragraphs
+		formattedText = formattedText.replace(paragraphRegex, '<p style="text-align: justify;">$2</p>');
+
+		// Format list items
+		formattedText = formattedText.replace(listItemRegex, '<li>$2</li>');
+
+		// Wrap list items in <ul> tags, if any list items are present
+		if (formattedText.match(/<li>/)) {
+			formattedText = formattedText.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+		}
+
+		// Replace new lines with paragraph breaks for normal text
+		formattedText = formattedText
+			.split(newLineRegex)
+			.map((paragraph) => (paragraph.trim() ? `<p style="text-align: justify;">${paragraph.trim()}</p>` : ''))
+			.join('');
+
+		return formattedText;
+	};
+
 	/**
 	 * @type {{ content: string; }}
 	 */
@@ -74,21 +106,21 @@
 	let parts = [];
 
 	// Split message content by code block and inline code
-    $: {
-        const codeRegex = /(```[\w\s\S]*?```)|(`[^`]*`)/gs;
-        parts = message.content.split(codeRegex).map((part) => {
-            if (!part) return { text: '' };
-            const blockMatch = /```(\w*)\s*([\s\S]*)```/.exec(part);
-            const inlineMatch = /`([^`]*)`/.exec(part);
-            if (blockMatch) {
-                return { language: blockMatch[1] || 'ts', code: blockMatch[2] };
-            } else if (inlineMatch) {
-                return { inlineCode: inlineMatch[1] };
-            } else {
-                return { text: part };
-            }
-        });
-    }
+	$: {
+		const codeRegex = /(```[\w\s\S]*?```)|(`[^`]*`)/gs;
+		parts = message.content.split(codeRegex).map((part) => {
+			if (!part) return { text: '' };
+			const blockMatch = /```(\w*)\s*([\s\S]*)```/.exec(part);
+			const inlineMatch = /`([^`]*)`/.exec(part);
+			if (blockMatch) {
+				return { language: blockMatch[1] || 'ts', code: blockMatch[2] };
+			} else if (inlineMatch) {
+				return { inlineCode: inlineMatch[1] };
+			} else {
+				return { text: part };
+			}
+		});
+	}
 </script>
 
 {#each parts as part (part)}
@@ -97,6 +129,7 @@
 	{:else if part.inlineCode}
 		<span class="px-0.5 bg-green-500 bg-opacity-20 text-green-400">{part.inlineCode}</span>
 	{:else}
+		<!-- {@html formatText(part.text)} -->
 		{part.text}
 	{/if}
 {/each}
@@ -128,3 +161,4 @@
 // 		{part.text}
 // 	{/if}
 // {/each} -->
+

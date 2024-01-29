@@ -15,34 +15,14 @@
 	} from 'firebase/firestore';
 	import firebaseConfig from '$lib/firebase/firebase.client';
 	import { Collection } from 'sveltefire';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
+	import { setContext } from 'svelte';
+	import { writable } from 'svelte/store';
+	import { sharedVariable } from '../../../routes/stores';
+
 	let valueSingle: string = 'dashboard';
 
 	export let userId: any;
-
-	let navItems = [
-		{
-			name: 'Python Code to C++',
-			value: 'code',
-			icon: `<i class="ri-code-s-slash-line"></i>`
-		},
-		{
-			name: 'Posts',
-			value: 'posts',
-			icon: `<i class="ri-image-add-line ri-xl"></i>` // Add SVG here
-		},
-		{
-			name: 'Analytics',
-			value: 'analytics',
-			icon: `<i class="ri-line-chart-line ri-xl"></i>` // Add SVG here
-		},
-		{
-			name: 'Settings',
-			value: 'settings',
-			icon: `<i class="ri-settings-2-line ri-xl"></i>` // Add SVG here
-		}
-		// Add more items as needed...
-	];
 
 	// const chatsDocRef = db.collection('chats').doc(userId).collection('MyAiChats');
 	const app = initializeApp(firebaseConfig);
@@ -86,6 +66,12 @@
 			time: new Date()
 		});
 		console.log('Added Chat');
+	}
+
+	function onChatClicked(itemId: any) {
+		goto(`/main/chats/${itemId}`);
+		$sharedVariable = itemId;
+		// Create a store and update it when necessary...
 	}
 </script>
 
@@ -156,7 +142,47 @@
 		{#if searchValue === ''}
 			<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
 				{#each data as item (item.id)}
-					<div class="flex items-center p-4 bg-white rounded-lg shadow bg-opacity-5">
+					<a
+						class="bg-white bg-opacity-5"
+						style="padding: 0; border-radius: 0px;"
+						href={`/main/chats/${item.id}`}
+						on:click={() => onChatClicked(item.id)}
+					>
+						<div
+							class={`flex   items-center  w-full p-4 ${$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``} rounded-lg shadow `}
+						>
+							<!-- Lead: Avatar -->
+							<div class="flex-shrink-0">
+								<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
+								<!-- {@html item.icon} -->
+								<i class="ri-code-s-slash-line"></i>
+							</div>
+
+							<!-- Title and Subtitle -->
+							<div class="flex flex-col justify-start w-32 ml-4">
+								<div class="text-sm font-semibold truncate">{item.title}</div>
+								<div class="overflow-hidden text-sm text-gray-500 truncate">
+									{item.subTitle}
+								</div>
+							</div>
+
+							<!-- Trailing: Time -->
+							<div class="ml-auto text-sm text-gray-500">3 min ago</div>
+						</div>
+					</a>
+				{/each}
+			</Collection>
+		{:else}
+			{#each find(chats, searchValue) as item (item.id)}
+				<a
+					class="bg-white bg-opacity-5"
+					style="padding: 0; border-radius: 0px;"
+					href={`/main/chats/${item.id}`}
+					on:click={() => onChatClicked(item.id)}
+				>
+					<div
+						class={`flex items-center  w-full p-4 ${$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``} rounded-lg shadow `}
+					>
 						<!-- Lead: Avatar -->
 						<div class="flex-shrink-0">
 							<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
@@ -175,29 +201,7 @@
 						<!-- Trailing: Time -->
 						<div class="ml-auto text-sm text-gray-500">3 min ago</div>
 					</div>
-				{/each}
-			</Collection>
-		{:else}
-			{#each find(chats, searchValue) as item (item.id)}
-				<div class="flex items-center p-4 bg-white rounded-lg shadow bg-opacity-5">
-					<!-- Lead: Avatar -->
-					<div class="flex-shrink-0">
-						<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
-						<!-- {@html item.icon} -->
-						<i class="ri-code-s-slash-line"></i>
-					</div>
-
-					<!-- Title and Subtitle -->
-					<div class="w-32 ml-4">
-						<div class="text-sm font-semibold truncate">{item.title}</div>
-						<div class="overflow-hidden text-sm text-gray-500 truncate">
-							{item.subTitle}
-						</div>
-					</div>
-
-					<!-- Trailing: Time -->
-					<div class="ml-auto text-sm text-gray-500">3 min ago</div>
-				</div>
+				</a>
 			{/each}
 		{/if}
 	</ListBox>
