@@ -15,7 +15,7 @@
 
 	// console.log('user id: ' + user.uid);
 
-    	// Initialize Firebase
+    // Initialize Firebase
 	const app = initializeApp(firebaseConfig);
 
 	const auth = getAuth(app);

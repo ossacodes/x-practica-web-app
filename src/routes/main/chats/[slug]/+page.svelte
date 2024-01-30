@@ -9,7 +9,7 @@
 	import { getAuth } from 'firebase/auth';
 	import Appbar from '$lib/components/Admin/Appbar.svelte';
 	import { AppShell } from '@skeletonlabs/skeleton';
-    import { sharedVariable } from '../../../stores';
+	import { sharedVariable } from '../../../stores';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -20,7 +20,7 @@
 
 	const user = userStore(auth);
 
-    $sharedVariable = $page.params.slug;
+	$sharedVariable = $page.params.slug;
 </script>
 
 <!-- <h1>
@@ -36,6 +36,7 @@
 	<div class="flex flex-col h-screen">
 		<Appbar />
 		<!-- <ChatSection /> -->
+		<!-- <PromptTextField userId={$user?.uid} chatId={$page.params.slug} chatData={data.chatData.data} messageHistory={data.chatData.messageHistory}/> -->
 		<PromptTextField userId={$user?.uid} chatId={$page.params.slug} />
 	</div>
 

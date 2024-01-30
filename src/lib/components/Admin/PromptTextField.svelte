@@ -1,40 +1,32 @@
 <script>
-	import { useChat } from 'ai/svelte';
-	// @ts-ignore
-	// @ts-ignore
-	import { getContext, onMount } from 'svelte';
-	// @ts-ignore
-	// @ts-ignore
+	// @ts-nocheck
+
+	import { onMount, getContext } from 'svelte';
 	import { writable } from 'svelte/store';
-	// @ts-ignore
-	// @ts-ignore
 	import { currentUserId } from '$lib/userState';
-	// @ts-ignore
 	import firebaseConfig, { db } from '$lib/firebase/firebase.client';
 	import { initializeApp } from 'firebase/app';
 	import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
 	import CompCard from './CompCard.svelte';
 	import { Paperclip, StopCircle } from 'lucide-svelte';
 	import Dropdown from './Dropdown.svelte';
+	import { navigating } from '$app/stores';
+	import Loader from './Loader.svelte';
+	import { useChat } from 'ai/svelte';
 
-	/**
-	 * @type {string}
-	 */
-	// @ts-ignore
 	export let userId;
-
-	/**
-	 * @type {any}
-	 */
-	 export let chatId;
+	export let chatId;
 
 	let showDropdown = false;
 	let position = { x: 0, y: 0 };
 	let items = ['Copy', 'Reply', 'Text to Speech', 'Delete'];
+	let isPageLoading = false;
+	let data = [];
+	let messageHistory = [];
+	let aiChatId;
 
-	// @ts-ignore
 	const handleRightClick = (event) => {
-		event.preventDefault(); // Prevent default right-click menu
+		event.preventDefault();
 		position = { x: event.clientX, y: event.clientY };
 		showDropdown = true;
 	};
@@ -43,43 +35,23 @@
 		showDropdown = false;
 	};
 
-	/**
-	 * @type {string | any[]}
-	 */
-	let data = [];
-
-	/**
-	 * @type {{ role: any; content: any; }[]}
-	 */
-	let messageHistory = [];
-
-	const app = initializeApp(firebaseConfig);
-	// @ts-ignore
-	const firestore = getFirestore(app);
-
-	// Fetch data from a Firestore collection
 	async function fetchData() {
-		// const snapshot = await db.collection('chats').doc(userId).collection('MyAiChats').get();
-		// const data = snapshot.docs.map((doc) => doc.data());
-		// @ts-ignore
+		isPageLoading = true;
+		const app = initializeApp(firebaseConfig);
+		const firestore = getFirestore(app);
 		const collectionRef = collection(firestore, `chats/${userId}/${chatId}`);
 		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'asc')));
 		data = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		querySnapshot.docs.forEach((doc) => {
-			messageHistory.push({
-				role: doc.data().role,
-				content: doc.data().content
-			});
-		});
+		messageHistory = querySnapshot.docs.map((doc) => ({
+			role: doc.data().role,
+			content: doc.data().content
+		}));
+		isPageLoading = false;
 	}
 
-	// console.log(messageHistory);
+	onMount(fetchData);
 
-	onMount(() => {
-		fetchData();
-	});
-
-	const { messages, handleSubmit, input, isLoading, stop } = useChat({
+	const { messages, handleSubmit, input, isLoading, stop, setMessages } = useChat({
 		api: 'http://localhost:5173/main/chats',
 		body: {
 			userId: userId,
@@ -89,38 +61,35 @@
 		initialMessages: data
 	});
 
+	$: if (chatId) {
+		console.log('chatId', chatId);
+		isPageLoading = true;
+		data = [];
+		messageHistory = [];
+		setMessages([]);
+		(async () => {
+			await fetchData();
+			isPageLoading = false;
+		})();
+	}
+
 	let isDragging = false;
 	let isGenerating = false;
 
-	// onMount(() => {
-	// 	isGenerating = $isLoading?.valueOf();
-	// });
-
-	/**
-	 * @param {{ preventDefault: () => void; }} event
-	 */
 	function onDragOver(event) {
-		event.preventDefault(); // Necessary to allow dropping
+		event.preventDefault();
 		isDragging = true;
 	}
-	/**
-	 * @param {{ preventDefault: () => void; }} event
-	 */
+
 	function onDragLeave(event) {
 		isDragging = false;
 	}
-	/**
-	 * @param {{ preventDefault: () => void; }} event
-	 */
+
 	function onDrop(event) {
 		event.preventDefault();
 		isDragging = false;
-
-		// Access the files from the drop event
-		// @ts-ignore
 		const files = event.dataTransfer.files;
 		if (files.length > 0) {
-			// Handle the files, for example, uploading or reading file content
 			console.log('Dropped files:', files);
 		}
 	}
@@ -129,27 +98,59 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-	class:highlight={isDragging}
-	on:dragover={onDragOver}
-	on:dragleave={onDragLeave}
-	on:drop={onDrop}
-	class="flex flex-col-reverse items-center justify-start flex-1 overflow-y-auto"
->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	{#if isDragging}
-		<div class="border-2 border-gray-400 border-dashed rounded-lg sm:w-full lg:w-1/2 h-52">
-			Drop files here
-		</div>
-	{/if}
+{#if isPageLoading}
+	<div class="flex items-center justify-center flex-1 overflow-y-auto">
+		<Loader />
+	</div>
+{:else}
 	<div
-		class={`${isDragging === true ? 'pointer-events-none' : ''} flex flex-col justify-center space-y-4  sm:w-full lg:w-1/2`}
+		class:highlight={isDragging}
+		on:dragover={onDragOver}
+		on:dragleave={onDragLeave}
+		on:drop={onDrop}
+		class="flex flex-col-reverse items-center justify-start flex-1 overflow-y-auto"
 	>
-		{#if data.length > 0}
-			<ul>
-				{#each data as message}
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		{#if isDragging}
+			<div class="border-2 border-gray-400 border-dashed rounded-lg sm:w-full lg:w-1/2 h-52">
+				Drop files here
+			</div>
+		{/if}
+		<div
+			class={`${isDragging === true ? 'pointer-events-none' : ''} flex flex-col justify-center space-y-4  sm:w-full lg:w-1/2`}
+		>
+			{#if data.length > 0}
+				<ul>
+					{#each data as message}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<div
+							on:click={handleClickOutside}
+							class={`flex mt-5 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+						>
+							<div
+								on:contextmenu={handleRightClick}
+								on:click={handleClickOutside}
+								class={`p-2 max-w-lg rounded-lg ${message.role === 'user' ? 'bg-blue-800 bg-opacity-30 text-white' : 'bg-gray-200 bg-opacity-5 text-gray'}`}
+							>
+								<CompCard {message} />
+							</div>
+							{#if showDropdown}
+								<Dropdown {items} {position} />
+							{/if}
+						</div>
+					{/each}
+				</ul>
+			{:else}
+				<div></div>
+			{/if}
+
+			{#if $messages.length > 0}
+				{#each $messages as message}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<div on:click={handleClickOutside} class={`flex mt-5 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+					<div
+						on:click={handleClickOutside}
+						class={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+					>
 						<div
 							on:contextmenu={handleRightClick}
 							on:click={handleClickOutside}
@@ -162,30 +163,10 @@
 						{/if}
 					</div>
 				{/each}
-			</ul>
-		{:else}
-			<div></div>
-		{/if}
-
-		{#if $messages.length > 0}
-			{#each $messages as message}
-				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div on:click={handleClickOutside} class={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-					<div
-						on:contextmenu={handleRightClick}
-						on:click={handleClickOutside}
-						class={`p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-800 bg-opacity-30 text-white' : 'bg-gray-200 bg-opacity-5 text-gray'}`}
-					>
-						<CompCard {message} />
-					</div>
-					{#if showDropdown}
-						<Dropdown {items} {position} />
-					{/if}
-				</div>
-			{/each}
-		{/if}
+			{/if}
+		</div>
 	</div>
-</div>
+{/if}
 
 <form on:submit={handleSubmit}>
 	<div class="flex justify-center pt-2 pb-6">

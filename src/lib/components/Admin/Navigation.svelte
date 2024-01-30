@@ -69,7 +69,7 @@
 	}
 
 	function onChatClicked(itemId: any) {
-		goto(`/main/chats/${itemId}`);
+		goto(`/main/chats/${itemId}?userId=${userId}`);
 		$sharedVariable = itemId;
 		// Create a store and update it when necessary...
 	}
@@ -145,7 +145,7 @@
 					<a
 						class="bg-white bg-opacity-5"
 						style="padding: 0; border-radius: 0px;"
-						href={`/main/chats/${item.id}`}
+						href={`/main/chats/${item.id}?userId=${userId}`}
 						on:click={() => onChatClicked(item.id)}
 					>
 						<div
@@ -177,7 +177,7 @@
 				<a
 					class="bg-white bg-opacity-5"
 					style="padding: 0; border-radius: 0px;"
-					href={`/main/chats/${item.id}`}
+					href={`/main/chats/${item.id}?userId=${userId}`}
 					on:click={() => onChatClicked(item.id)}
 				>
 					<div
