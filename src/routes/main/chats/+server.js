@@ -36,9 +36,9 @@ export const POST = async ({ request }) => {
 	// });
 
     const response = await fireworks.chat.completions.create({
-		model: 'accounts/fireworks/models/mixtral-8x7b-instruct',
+		model: 'accounts/fireworks/models/yi-34b-200k-capybara',
 		stream: true,
-		max_tokens: 1000,
+		max_tokens: 2000,
         messages: combinedMessages.map((/** @type {{ content: any; role: any; }} */ message) => ({
 			content: message.content,
 			role: message.role

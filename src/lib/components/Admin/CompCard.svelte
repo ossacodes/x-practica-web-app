@@ -130,7 +130,7 @@
 		<span class="px-0.5 bg-green-500 bg-opacity-20 text-green-400">{part.inlineCode}</span>
 	{:else}
 		<!-- {@html formatText(part.text)} -->
-		{part.text}
+		{@html part.text}
 	{/if}
 {/each}
 

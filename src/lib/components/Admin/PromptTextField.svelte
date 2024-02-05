@@ -13,6 +13,7 @@
 	import { navigating } from '$app/stores';
 	import Loader from './Loader.svelte';
 	import { useChat } from 'ai/svelte';
+	import ChatLoader from './ChatLoader.svelte';
 
 	export let userId;
 	export let chatId;
@@ -24,6 +25,7 @@
 	let data = [];
 	let messageHistory = [];
 	let aiChatId;
+	let isGenerating = true;
 
 	const handleRightClick = (event) => {
 		event.preventDefault();
@@ -74,7 +76,6 @@
 	}
 
 	let isDragging = false;
-	let isGenerating = false;
 
 	function onDragOver(event) {
 		event.preventDefault();
@@ -163,6 +164,14 @@
 						{/if}
 					</div>
 				{/each}
+			{/if}
+
+			{#if $isLoading}
+				<div class="flex items-center justify-start flex-1 overflow-y-auto">
+					<ChatLoader />
+				</div>
+			{:else}
+			  <div></div>
 			{/if}
 		</div>
 	</div>

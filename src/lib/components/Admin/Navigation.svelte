@@ -19,6 +19,7 @@
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { sharedVariable } from '../../../routes/stores';
+	import { Columns3, MoreHorizontal } from 'lucide-svelte';
 
 	let valueSingle: string = 'dashboard';
 
@@ -155,7 +156,7 @@
 							<div class="flex-shrink-0">
 								<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
 								<!-- {@html item.icon} -->
-								<i class="ri-code-s-slash-line"></i>
+								<Columns3 />
 							</div>
 
 							<!-- Title and Subtitle -->
@@ -167,7 +168,11 @@
 							</div>
 
 							<!-- Trailing: Time -->
-							<div class="ml-auto text-sm text-gray-500">3 min ago</div>
+							<button style="padding: 0; border-radius: 0px;" class="ml-auto">
+								<div class="ml-auto text-sm text-gray-500">
+									<MoreHorizontal />
+								</div>
+							</button>
 						</div>
 					</a>
 				{/each}
@@ -187,7 +192,7 @@
 						<div class="flex-shrink-0">
 							<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
 							<!-- {@html item.icon} -->
-							<i class="ri-code-s-slash-line"></i>
+							<Columns3 />
 						</div>
 
 						<!-- Title and Subtitle -->
@@ -199,7 +204,11 @@
 						</div>
 
 						<!-- Trailing: Time -->
-						<div class="ml-auto text-sm text-gray-500">3 min ago</div>
+						<button style="padding: 0; border-radius: 0px;" class="ml-auto">
+							<div class="ml-auto text-sm text-gray-500">
+								<MoreHorizontal />
+							</div>
+						</button>
 					</div>
 				</a>
 			{/each}

@@ -20,7 +20,7 @@
 				// Signed in
 				const user = userCredential.user;
 				isLoading = false;
-				goto('/User');
+				goto('/main/Login');
 				// ...
 			})
 			.catch((error) => {
@@ -92,7 +92,7 @@
 			<div class="flex items-center justify-center">
 				<p class="text-sm font-medium text-white">
 					Don't have an account? <a
-						href="/User/Register"
+						href="/main/Register"
 						class="text-indigo-500 hover:text-indigo-300">Create Account</a
 					>
 				</p>

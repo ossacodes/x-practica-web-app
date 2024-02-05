@@ -15,7 +15,7 @@
 
 	const user = userStore(auth);
 	if ($user?.uid != null) {
-		goto('/User');
+		goto('/main');
 	}
 
 	function handleCreateAccount() {
@@ -39,7 +39,7 @@
 				const user = userCredential.user;
 				isLoading = false;
 				console.log(user);
-				goto('/User');
+				goto('/Login');
 				// ...
 			})
 			.catch((error) => {
@@ -129,7 +129,7 @@
 			<div class="flex items-center justify-center">
 				<p class="text-sm font-medium text-white">
 					Already have an account? <a
-						href="/User/Login"
+						href="/main/Login"
 						class="text-indigo-500 hover:text-indigo-300">Login</a
 					>
 				</p>

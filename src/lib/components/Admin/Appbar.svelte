@@ -14,6 +14,7 @@
 	import Navigation from '$lib/components/Admin/Navigation.svelte';
 	import { SignedIn } from 'sveltefire';
 	import { goto } from '$app/navigation';
+	import { CreditCard, Settings } from 'lucide-svelte';
 
 	export let userId: any;
 
@@ -76,7 +77,7 @@
 		</button>
 
 		<div class="pl-3">
-			<button  class="justify-between w-48" use:popup={popupCombobox}>
+			<button class="justify-between w-48" use:popup={popupCombobox}>
 				<span class="pr-3 capitalize">{comboboxValue ?? 'GPT-3.5-Turbo'}</span>
 				<span>↓</span>
 			</button>
@@ -86,9 +87,15 @@
 		<div class="w-48 py-2 shadow-xl card" data-popup="popupCombobox">
 			<ListBox rounded="rounded-none">
 				<ListBoxItem bind:group={comboboxValue} name="medium" value="GPT-4">GPT-4</ListBoxItem>
-				<ListBoxItem bind:group={comboboxValue} name="medium" value="GPT-3.5-Turbo">GPT-3.5-Turbo</ListBoxItem>
-				<ListBoxItem bind:group={comboboxValue} name="medium" value="Mixtral MoE 8x7B">Mixtral MoE 8x7B</ListBoxItem>
-				<ListBoxItem bind:group={comboboxValue} name="medium" value="Llama 2 70B Chat">Llama 2 70B Chat</ListBoxItem>
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="GPT-3.5-Turbo"
+					>GPT-3.5-Turbo</ListBoxItem
+				>
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="Mixtral MoE 8x7B"
+					>Mixtral MoE 8x7B</ListBoxItem
+				>
+				<ListBoxItem bind:group={comboboxValue} name="medium" value="Llama 2 70B Chat"
+					>Llama 2 70B Chat</ListBoxItem
+				>
 			</ListBox>
 			<div class="arrow bg-surface-100-800-token" />
 		</div>
@@ -108,6 +115,22 @@
 
 		<div class="p-4 shadow-xl card w-52" data-popup="popupFeatured">
 			<SignedIn let:signOut>
+				<div class="mb-4 space-y-2">
+					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
+						<Settings />
+						<a href="/main/settings" class="flex items-center p-2 rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Settings</span>
+						</a>
+					</div>
+					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
+						<CreditCard />
+						<a href="/main/billing" class="flex items-center p-2 rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Billing</span>
+						</a>
+					</div>
+				</div>
 				<div>
 					<button
 						on:click={() => {
