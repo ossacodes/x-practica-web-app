@@ -14,7 +14,7 @@
 	import Navigation from '$lib/components/Admin/Navigation.svelte';
 	import { SignedIn } from 'sveltefire';
 	import { goto } from '$app/navigation';
-	import { CreditCard, Settings } from 'lucide-svelte';
+	import { CreditCard, Settings, LogOut } from 'lucide-svelte';
 
 	export let userId: any;
 
@@ -26,11 +26,11 @@
 		drawerStore.open();
 	}
 
-	const popupFeatured: PopupSettings = {
+	const popupProfile: PopupSettings = {
 		// Represents the type of event that opens/closed the popup
 		event: 'click',
 		// Matches the data-popup value on your popup element
-		target: 'popupFeatured',
+		target: 'popupProfile',
 		// Defines which side of your trigger the popup will appear
 		placement: 'left'
 	};
@@ -109,13 +109,31 @@
 	</div>
 	<svelte:fragment slot="trail">
 		<LightSwitch />
-		<button class="btn" use:popup={popupFeatured}>
+		<button class="btn" use:popup={popupProfile}>
 			<Avatar initials="JD" width="w-10" background="bg-primary-500" />
 		</button>
 
-		<div class="p-4 shadow-xl card w-52" data-popup="popupFeatured">
+		<div class="p-4 shadow-xl card w-52" data-popup="popupProfile">
 			<SignedIn let:signOut>
-				<div class="mb-4 space-y-2">
+				<div class="space-y-2">
+					<div class="flex min-w-0 gap-x-4">
+						<div class="flex-auto min-w-0">
+							<p class="text-lg font-semibold leading-6 text-white">Leslie Alexander</p>
+							<p class="mt-1 text-xs leading-5 text-gray-500 truncate">
+								leslie.alexander@example.com
+							</p>
+						</div>
+					</div>
+
+					<div class="h-[1px] bg-gray-600"></div>
+
+					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
+						<CreditCard />
+						<a href="/main/billing" class="flex items-center p-2 rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Billing</span>
+						</a>
+					</div>
 					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
 						<Settings />
 						<a href="/main/settings" class="flex items-center p-2 rounded-lg">
@@ -124,25 +142,19 @@
 						</a>
 					</div>
 					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
-						<CreditCard />
-						<a href="/main/billing" class="flex items-center p-2 rounded-lg">
+						<LogOut />
+						<button
+							on:click={() => {
+								signOut();
+								goto('/');
+							}}
+							class="flex items-center p-2 rounded-lg"
+						>
 							<!-- Add your icon here -->
-							<span class="ml-2">Billing</span>
-						</a>
+							<span class="ml-2">Logout</span>
+						</button>
 					</div>
 				</div>
-				<div>
-					<button
-						on:click={() => {
-							signOut();
-							goto('/');
-						}}
-						class="w-full btn variant-filled"
-					>
-						<span>Sign Out</span>
-					</button>
-				</div>
-				<div class="arrow bg-surface-100-800-token" />
 			</SignedIn>
 		</div>
 	</svelte:fragment>

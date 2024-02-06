@@ -2,6 +2,8 @@
 <script>
 	import { fly } from 'svelte/transition';
 	import { Copy, Reply, Mic, Trash } from 'lucide-svelte';
+
+	export let messageId;
 	/**
 	 * @type {any[]}
 	 */
@@ -10,7 +12,7 @@
 
 	const handleClick = (/** @type {any} */ item) => {
 		// Handle click event on dropdown items
-		console.log(`Clicked on ${item}`);
+		console.log(`Clicked on ${item} ${messageId}`);
 	};
 
 	const getIcon = (/** @type {any} */ item) => {

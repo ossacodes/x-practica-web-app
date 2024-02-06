@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { ListBox, ListBoxItem } from '@skeletonlabs/skeleton';
+	import { ListBox, ListBoxItem, popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import SearchTextField from './SearchTextField.svelte';
 	import { initializeApp } from 'firebase/app';
 	import {
@@ -19,11 +19,20 @@
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { sharedVariable } from '../../../routes/stores';
-	import { Columns3, MoreHorizontal } from 'lucide-svelte';
+	import { Columns3, Layers2, MoreHorizontal, Trash2 } from 'lucide-svelte';
 
 	let valueSingle: string = 'dashboard';
 
 	export let userId: any;
+
+	const popupFeatured: PopupSettings = {
+		// Represents the type of event that opens/closed the popup
+		event: 'click',
+		// Matches the data-popup value on your popup element
+		target: 'popupFeatured',
+		// Defines which side of your trigger the popup will appear
+		placement: 'right'
+	};
 
 	// const chatsDocRef = db.collection('chats').doc(userId).collection('MyAiChats');
 	const app = initializeApp(firebaseConfig);
@@ -77,108 +86,71 @@
 </script>
 
 <nav class="p-2">
-	<ListBox rounded="rounded" class="space-y-1 list-nav">
-		<div class="flex items-center justify-between mx-2 mt-5 text-2xl rounded-none">
-			Chats(4)
-			<button
-				style="border-radius: 5px; background-color: white;"
-				on:click={addChat}
-				class="flex items-center justify-center bg-white hover:bg-white h-7 w-7"
-				aria-label="Add Chat"
-			>
-				<center>
-					<svg
-						width="12"
-						height="12"
-						viewBox="0 0 12 12"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<g id="24 / basic / plus">
-							<path
-								id="icon"
-								fill-rule="evenodd"
-								clip-rule="evenodd"
-								d="M6.5 5.5H11V6.5H6.5V11H5.5V6.5H1V5.5H5.5V1H6.5V5.5Z"
-								fill="black"
-								stroke="black"
-							/>
-						</g>
-					</svg>
-				</center>
-			</button>
-		</div>
-		<div class="h-3"></div>
-		<!-- Search Bar -->
-		<div class="flex justify-center p-2">
-			<div
-				class="flex items-center justify-center w-full pl-3 bg-white border border-slate-700 rounded-xl bg-opacity-5"
-			>
+	<div class="flex items-center justify-between mx-2 mt-5 text-2xl rounded-none">
+		Chats(4)
+		<button
+			style="border-radius: 5px; background-color: white;"
+			on:click={addChat}
+			class="flex items-center justify-center bg-white hover:bg-white h-7 w-7"
+			aria-label="Add Chat"
+		>
+			<center>
 				<svg
-					width="20"
-					height="20"
-					viewBox="0 0 14 15"
+					width="12"
+					height="12"
+					viewBox="0 0 12 12"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<path
-						fill-rule="evenodd"
-						clip-rule="evenodd"
-						d="M1.1665 6.72414C1.1665 3.93099 3.4067 1.66669 6.17013 1.66669C7.49717 1.66669 8.76986 2.19952 9.70822 3.14798C10.6466 4.09644 11.1737 5.38282 11.1737 6.72414C11.1737 9.5173 8.93355 11.7816 6.17013 11.7816C3.4067 11.7816 1.1665 9.5173 1.1665 6.72414ZM11.091 10.7984L12.5812 12.0013H12.6071C12.9085 12.306 12.9085 12.8001 12.6071 13.1048C12.3056 13.4095 11.8167 13.4095 11.5153 13.1048L10.2786 11.6875C10.1617 11.5697 10.096 11.4097 10.096 11.2429C10.096 11.0761 10.1617 10.9161 10.2786 10.7984C10.5041 10.5744 10.8655 10.5744 11.091 10.7984Z"
-						fill="#E7E7E7"
-						fill-opacity="0.5"
-					/>
+					<g id="24 / basic / plus">
+						<path
+							id="icon"
+							fill-rule="evenodd"
+							clip-rule="evenodd"
+							d="M6.5 5.5H11V6.5H6.5V11H5.5V6.5H1V5.5H5.5V1H6.5V5.5Z"
+							fill="black"
+							stroke="black"
+						/>
+					</g>
 				</svg>
-
-				<input
-					class="w-full bg-transparent border-0 border-none placeholder:text-sm focus:ring-0"
-					title="Input (text)"
-					type="text"
-					placeholder="Search..."
-					bind:value={searchValue}
+			</center>
+		</button>
+	</div>
+	<div class="h-3"></div>
+	<!-- Search Bar -->
+	<div class="flex justify-center p-2">
+		<div
+			class="flex items-center justify-center w-full pl-3 bg-white border border-slate-700 rounded-xl bg-opacity-5"
+		>
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 14 15"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					fill-rule="evenodd"
+					clip-rule="evenodd"
+					d="M1.1665 6.72414C1.1665 3.93099 3.4067 1.66669 6.17013 1.66669C7.49717 1.66669 8.76986 2.19952 9.70822 3.14798C10.6466 4.09644 11.1737 5.38282 11.1737 6.72414C11.1737 9.5173 8.93355 11.7816 6.17013 11.7816C3.4067 11.7816 1.1665 9.5173 1.1665 6.72414ZM11.091 10.7984L12.5812 12.0013H12.6071C12.9085 12.306 12.9085 12.8001 12.6071 13.1048C12.3056 13.4095 11.8167 13.4095 11.5153 13.1048L10.2786 11.6875C10.1617 11.5697 10.096 11.4097 10.096 11.2429C10.096 11.0761 10.1617 10.9161 10.2786 10.7984C10.5041 10.5744 10.8655 10.5744 11.091 10.7984Z"
+					fill="#E7E7E7"
+					fill-opacity="0.5"
 				/>
-			</div>
+			</svg>
+
+			<input
+				class="w-full bg-transparent border-0 border-none placeholder:text-sm focus:ring-0"
+				title="Input (text)"
+				type="text"
+				placeholder="Search..."
+				bind:value={searchValue}
+			/>
 		</div>
-		<div class="h-3"></div>
-		{#if searchValue === ''}
-			<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
-				{#each data as item (item.id)}
-					<a
-						class="bg-white bg-opacity-5"
-						style="padding: 0; border-radius: 0px;"
-						href={`/main/chats/${item.id}?userId=${userId}`}
-						on:click={() => onChatClicked(item.id)}
-					>
-						<div
-							class={`flex   items-center  w-full p-4 ${$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``} rounded-lg shadow `}
-						>
-							<!-- Lead: Avatar -->
-							<div class="flex-shrink-0">
-								<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
-								<!-- {@html item.icon} -->
-								<Columns3 />
-							</div>
-
-							<!-- Title and Subtitle -->
-							<div class="flex flex-col justify-start w-32 ml-4">
-								<div class="text-sm font-semibold truncate">{item.title}</div>
-								<div class="overflow-hidden text-sm text-gray-500 truncate">
-									{item.subTitle}
-								</div>
-							</div>
-
-							<!-- Trailing: Time -->
-							<button style="padding: 0; border-radius: 0px;" class="ml-auto">
-								<div class="ml-auto text-sm text-gray-500">
-									<MoreHorizontal />
-								</div>
-							</button>
-						</div>
-					</a>
-				{/each}
-			</Collection>
-		{:else}
-			{#each find(chats, searchValue) as item (item.id)}
+	</div>
+	<div class="h-3"></div>
+	{#if searchValue === ''}
+		<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
+			{#each data as item (item.id)}
 				<a
 					class="bg-white bg-opacity-5"
 					style="padding: 0; border-radius: 0px;"
@@ -186,7 +158,9 @@
 					on:click={() => onChatClicked(item.id)}
 				>
 					<div
-						class={`flex items-center  w-full p-4 ${$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``} rounded-lg shadow `}
+						class={`flex   items-center  w-full p-4 ${
+							$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
+						} rounded-lg shadow `}
 					>
 						<!-- Lead: Avatar -->
 						<div class="flex-shrink-0">
@@ -196,7 +170,7 @@
 						</div>
 
 						<!-- Title and Subtitle -->
-						<div class="w-32 ml-4">
+						<div class="flex flex-col justify-start w-32 ml-4">
 							<div class="text-sm font-semibold truncate">{item.title}</div>
 							<div class="overflow-hidden text-sm text-gray-500 truncate">
 								{item.subTitle}
@@ -204,14 +178,107 @@
 						</div>
 
 						<!-- Trailing: Time -->
-						<button style="padding: 0; border-radius: 0px;" class="ml-auto">
+						<button
+							style="padding: 0; border-radius: 0px;"
+							class="ml-auto"
+							use:popup={popupFeatured}
+						>
 							<div class="ml-auto text-sm text-gray-500">
 								<MoreHorizontal />
 							</div>
 						</button>
 					</div>
+					<!-- show popup -->
+					<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
+						<div class="space-y-2">
+							<button
+								class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+							>
+								<Layers2 />
+								<div class="flex items-center p-2 rounded-lg">
+									<!-- Add your icon here -->
+									<span class="ml-2">Duplicate</span>
+								</div>
+							</button>
+							<button
+								on:click={() => {
+									console.log('Delete');
+								}}
+								class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+							>
+								<Trash2 />
+								<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
+									<!-- Add your icon here -->
+									<span class="ml-2">Delete</span>
+								</div>
+							</button>
+						</div>
+					</div>
 				</a>
 			{/each}
-		{/if}
-	</ListBox>
+		</Collection>
+	{:else}
+		{#each find(chats, searchValue) as item (item.id)}
+			<a
+				class="bg-white bg-opacity-5"
+				style="padding: 0; border-radius: 0px;"
+				href={`/main/chats/${item.id}?userId=${userId}`}
+				on:click={() => onChatClicked(item.id)}
+			>
+				<div
+					class={`flex items-center  w-full p-4 ${
+						$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
+					} rounded-lg shadow `}
+				>
+					<!-- Lead: Avatar -->
+					<div class="flex-shrink-0">
+						<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
+						<!-- {@html item.icon} -->
+						<Columns3 />
+					</div>
+
+					<!-- Title and Subtitle -->
+					<div class="w-32 ml-4">
+						<div class="text-sm font-semibold truncate">{item.title}</div>
+						<div class="overflow-hidden text-sm text-gray-500 truncate">
+							{item.subTitle}
+						</div>
+					</div>
+
+					<!-- Trailing: Time -->
+					<button style="padding: 0; border-radius: 0px;" class="ml-auto" use:popup={popupFeatured}>
+						<div class="ml-auto text-sm text-gray-500">
+							<MoreHorizontal />
+						</div>
+					</button>
+				</div>
+			</a>
+			<!-- show popup -->
+			<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
+				<div class="space-y-2">
+					<button
+						class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+					>
+						<Layers2 />
+						<div class="flex items-center p-2 rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Duplicate</span>
+						</div>
+					</button>
+					<button
+						on:click={() => {
+							console.log('Delete');
+						}}
+						class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+					>
+						<Trash2 />
+						<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Delete</span>
+						</div>
+					</button>
+				</div>
+			</div>
+		{/each}
+	{/if}
 </nav>
