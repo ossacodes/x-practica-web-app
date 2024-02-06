@@ -53,6 +53,9 @@
 				content: doc.data().content
 			}));
 			hasData = querySnapshot.docs.length > 0;
+
+			// Add delay
+			await new Promise(resolve => setTimeout(resolve, 600));
 		} catch (error) {
 			console.error("Error fetching data: ", error);
 		} finally {

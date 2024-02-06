@@ -51,9 +51,7 @@
 			<!-- <svelte:fragment slot="header">
 				<Appbar />
 			</svelte:fragment> -->
-			<svelte:fragment slot="sidebarLeft">
-				<Navigation userId={$user?.uid} />
-			</svelte:fragment>
+
 			<!-- Router Slot -->
 			<div class="w-full p-0">
 				<slot />

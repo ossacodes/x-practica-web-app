@@ -10,9 +10,10 @@
 	import Appbar from '$lib/components/Admin/Appbar.svelte';
 	import { AppShell } from '@skeletonlabs/skeleton';
 	import { sharedVariable } from '../../../stores';
+	import Navigation from '$lib/components/Admin/Navigation.svelte';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	// /** @type {import('./$types').PageData} */
+	// export let data;
 
 	const app = initializeApp(firebaseConfig);
 
@@ -27,11 +28,17 @@
 	{$page.params.slug}
 </h1> -->
 
+<!-- svelte-ignore missing-declaration -->
 <AppShell slotPageContent="">
 	<!-- (sidebarLeft) -->
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
 	<!-- Router Slot -->
+	<svelte:fragment slot="sidebarLeft">
+		<div class="flex flex-col h-screen">
+			<Navigation userId={$user?.uid} />
+		</div>
+	</svelte:fragment>
 	<!-- <slot /> -->
 	<div class="flex flex-col h-screen">
 		<Appbar />

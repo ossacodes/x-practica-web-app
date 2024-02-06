@@ -85,8 +85,8 @@
 	}
 </script>
 
-<nav class="p-2">
-	<div class="flex items-center justify-between mx-2 mt-5 text-2xl rounded-none">
+<nav class="p-0">
+	<div class="sticky top-0 flex items-center justify-between w-full p-2 px-2 pt-5 text-2xl bg-transparent rounded-none backdrop-blur-sm">
 		Chats(4)
 		<button
 			style="border-radius: 5px; background-color: white;"
@@ -148,9 +148,78 @@
 		</div>
 	</div>
 	<div class="h-3"></div>
-	{#if searchValue === ''}
-		<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
-			{#each data as item (item.id)}
+	<div class="p-2">
+		{#if searchValue === ''}
+			<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
+				{#each data as item (item.id)}
+					<a
+						class="bg-white bg-opacity-5"
+						style="padding: 0; border-radius: 0px;"
+						href={`/main/chats/${item.id}?userId=${userId}`}
+						on:click={() => onChatClicked(item.id)}
+					>
+						<div
+							class={`flex   items-center  w-full p-4 ${
+								$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
+							} rounded-lg shadow `}
+						>
+							<!-- Lead: Avatar -->
+							<div class="flex-shrink-0">
+								<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
+								<!-- {@html item.icon} -->
+								<Columns3 />
+							</div>
+
+							<!-- Title and Subtitle -->
+							<div class="flex flex-col justify-start w-32 ml-4">
+								<div class="text-sm font-semibold truncate">{item.title}</div>
+								<div class="overflow-hidden text-sm text-gray-500 truncate">
+									{item.subTitle}
+								</div>
+							</div>
+
+							<!-- Trailing: Time -->
+							<button
+								style="padding: 0; border-radius: 0px;"
+								class="ml-auto"
+								use:popup={popupFeatured}
+							>
+								<div class="ml-auto text-sm text-gray-500">
+									<MoreHorizontal />
+								</div>
+							</button>
+						</div>
+						<!-- show popup -->
+						<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
+							<div class="space-y-2">
+								<button
+									class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+								>
+									<Layers2 />
+									<div class="flex items-center p-2 rounded-lg">
+										<!-- Add your icon here -->
+										<span class="ml-2">Duplicate</span>
+									</div>
+								</button>
+								<button
+									on:click={() => {
+										console.log('Delete');
+									}}
+									class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+								>
+									<Trash2 />
+									<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
+										<!-- Add your icon here -->
+										<span class="ml-2">Delete</span>
+									</div>
+								</button>
+							</div>
+						</div>
+					</a>
+				{/each}
+			</Collection>
+		{:else}
+			{#each find(chats, searchValue) as item (item.id)}
 				<a
 					class="bg-white bg-opacity-5"
 					style="padding: 0; border-radius: 0px;"
@@ -158,7 +227,7 @@
 					on:click={() => onChatClicked(item.id)}
 				>
 					<div
-						class={`flex   items-center  w-full p-4 ${
+						class={`flex items-center  w-full p-4 ${
 							$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
 						} rounded-lg shadow `}
 					>
@@ -170,7 +239,7 @@
 						</div>
 
 						<!-- Title and Subtitle -->
-						<div class="flex flex-col justify-start w-32 ml-4">
+						<div class="w-32 ml-4">
 							<div class="text-sm font-semibold truncate">{item.title}</div>
 							<div class="overflow-hidden text-sm text-gray-500 truncate">
 								{item.subTitle}
@@ -188,97 +257,34 @@
 							</div>
 						</button>
 					</div>
-					<!-- show popup -->
-					<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
-						<div class="space-y-2">
-							<button
-								class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
-							>
-								<Layers2 />
-								<div class="flex items-center p-2 rounded-lg">
-									<!-- Add your icon here -->
-									<span class="ml-2">Duplicate</span>
-								</div>
-							</button>
-							<button
-								on:click={() => {
-									console.log('Delete');
-								}}
-								class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
-							>
-								<Trash2 />
-								<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
-									<!-- Add your icon here -->
-									<span class="ml-2">Delete</span>
-								</div>
-							</button>
-						</div>
-					</div>
 				</a>
+				<!-- show popup -->
+				<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
+					<div class="space-y-2">
+						<button
+							class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+						>
+							<Layers2 />
+							<div class="flex items-center p-2 rounded-lg">
+								<!-- Add your icon here -->
+								<span class="ml-2">Duplicate</span>
+							</div>
+						</button>
+						<button
+							on:click={() => {
+								console.log('Delete');
+							}}
+							class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+						>
+							<Trash2 />
+							<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
+								<!-- Add your icon here -->
+								<span class="ml-2">Delete</span>
+							</div>
+						</button>
+					</div>
+				</div>
 			{/each}
-		</Collection>
-	{:else}
-		{#each find(chats, searchValue) as item (item.id)}
-			<a
-				class="bg-white bg-opacity-5"
-				style="padding: 0; border-radius: 0px;"
-				href={`/main/chats/${item.id}?userId=${userId}`}
-				on:click={() => onChatClicked(item.id)}
-			>
-				<div
-					class={`flex items-center  w-full p-4 ${
-						$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
-					} rounded-lg shadow `}
-				>
-					<!-- Lead: Avatar -->
-					<div class="flex-shrink-0">
-						<!-- <img class="w-12 h-12 rounded-full" src="{chat.avatar}" alt="avatar" /> -->
-						<!-- {@html item.icon} -->
-						<Columns3 />
-					</div>
-
-					<!-- Title and Subtitle -->
-					<div class="w-32 ml-4">
-						<div class="text-sm font-semibold truncate">{item.title}</div>
-						<div class="overflow-hidden text-sm text-gray-500 truncate">
-							{item.subTitle}
-						</div>
-					</div>
-
-					<!-- Trailing: Time -->
-					<button style="padding: 0; border-radius: 0px;" class="ml-auto" use:popup={popupFeatured}>
-						<div class="ml-auto text-sm text-gray-500">
-							<MoreHorizontal />
-						</div>
-					</button>
-				</div>
-			</a>
-			<!-- show popup -->
-			<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
-				<div class="space-y-2">
-					<button
-						class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
-					>
-						<Layers2 />
-						<div class="flex items-center p-2 rounded-lg">
-							<!-- Add your icon here -->
-							<span class="ml-2">Duplicate</span>
-						</div>
-					</button>
-					<button
-						on:click={() => {
-							console.log('Delete');
-						}}
-						class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
-					>
-						<Trash2 />
-						<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
-							<!-- Add your icon here -->
-							<span class="ml-2">Delete</span>
-						</div>
-					</button>
-				</div>
-			</div>
-		{/each}
-	{/if}
+		{/if}
+	</div>
 </nav>
