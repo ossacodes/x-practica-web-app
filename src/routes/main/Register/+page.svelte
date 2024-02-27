@@ -37,9 +37,10 @@
 				});
 
 				const user = userCredential.user;
+				const chatId = Date.now();
 				isLoading = false;
 				console.log(user);
-				goto('/Login');
+				goto(`/main/chats/${chatId}`);
 				// ...
 			})
 			.catch((error) => {

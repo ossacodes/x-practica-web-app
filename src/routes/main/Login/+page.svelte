@@ -20,7 +20,8 @@
 				// Signed in
 				const user = userCredential.user;
 				isLoading = false;
-				goto('/main/Login');
+				const chatId = Date.now();
+				goto(`/main/chats/${chatId}`);
 				// ...
 			})
 			.catch((error) => {

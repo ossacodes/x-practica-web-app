@@ -7,6 +7,7 @@
 		getFirestore,
 		collection,
 		setDoc,
+		deleteDoc,
 		doc,
 		getDocs,
 		query,
@@ -20,6 +21,7 @@
 	import { writable } from 'svelte/store';
 	import { sharedVariable } from '../../../routes/stores';
 	import { Columns3, Layers2, MoreHorizontal, Trash2 } from 'lucide-svelte';
+	import go from 'highlight.js/lib/languages/go';
 
 	let valueSingle: string = 'dashboard';
 
@@ -42,7 +44,7 @@
 
 	async function getNavData() {
 		const collectionRef = collection(firestore, `MyChats/${userId}/RoleChats/`);
-		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'asc')));
+		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'desc')));
 		querySnapshot.docs.forEach((doc) => {
 			chats.push({
 				id: doc.id,
@@ -69,13 +71,27 @@
 	}
 
 	async function addChat() {
-		await setDoc(doc(firestore, `MyChats/${userId}/RoleChats/${Date.now()}`), {
+		let chatId = Date.now();
+		await setDoc(doc(firestore, `MyChats/${userId}/RoleChats/${chatId}`), {
 			title: 'New Chat',
 			subTitle: 'Use any prompts to get started',
 			timestamp: Date.now(),
 			time: new Date()
 		});
+		onChatClicked(chatId);
 		console.log('Added Chat');
+	}
+
+	async function deleteChat(chatId: any) {
+		const collectionRef = collection(firestore, `chats/${userId}/${chatId}`);
+		const querySnapshot = await getDocs(query(collectionRef, orderBy('timestamp', 'asc')));
+		querySnapshot.docs.forEach(async (doc) => {
+			const docRef = doc.ref;
+			await deleteDoc(docRef);
+		});
+		await deleteDoc(doc(firestore, `MyChats/${userId}/RoleChats/${chatId}`));
+		console.log('Deleted Chat');
+		goto(`/main/chats/${Date.now()}?userId=${userId}`);
 	}
 
 	function onChatClicked(itemId: any) {
@@ -86,36 +102,41 @@
 </script>
 
 <nav class="p-0">
-	<div class="sticky top-0 flex items-center justify-between w-full p-2 px-2 pt-5 text-2xl bg-transparent rounded-none backdrop-blur-sm">
-		Chats(4)
-		<button
-			style="border-radius: 5px; background-color: white;"
-			on:click={addChat}
-			class="flex items-center justify-center bg-white hover:bg-white h-7 w-7"
-			aria-label="Add Chat"
+	<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
+		<div
+			class="sticky top-0 flex items-center justify-between w-full p-2 px-2 pt-5 text-2xl bg-transparent rounded-none backdrop-blur-sm"
 		>
-			<center>
-				<svg
-					width="12"
-					height="12"
-					viewBox="0 0 12 12"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<g id="24 / basic / plus">
-						<path
-							id="icon"
-							fill-rule="evenodd"
-							clip-rule="evenodd"
-							d="M6.5 5.5H11V6.5H6.5V11H5.5V6.5H1V5.5H5.5V1H6.5V5.5Z"
-							fill="black"
-							stroke="black"
-						/>
-					</g>
-				</svg>
-			</center>
-		</button>
-	</div>
+			Chats({data.length})
+			<button
+				style="border-radius: 5px; background-color: white;"
+				on:click={addChat}
+				class="flex items-center justify-center bg-white hover:bg-white h-7 w-7"
+				aria-label="Add Chat"
+			>
+				<center>
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 12 12"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<g id="24 / basic / plus">
+							<path
+								id="icon"
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+								d="M6.5 5.5H11V6.5H6.5V11H5.5V6.5H1V5.5H5.5V1H6.5V5.5Z"
+								fill="black"
+								stroke="black"
+							/>
+						</g>
+					</svg>
+				</center>
+			</button>
+		</div>
+	</Collection>
+
 	<div class="h-3"></div>
 	<!-- Search Bar -->
 	<div class="flex justify-center p-2">
@@ -148,20 +169,19 @@
 		</div>
 	</div>
 	<div class="h-3"></div>
-	<div class="p-2">
+	<div class="flex flex-col items-start justify-start p-2 space-y-1">
 		{#if searchValue === ''}
 			<Collection ref={query(collection(firestore, `MyChats/${userId}/RoleChats/`))} let:data>
 				{#each data as item (item.id)}
-					<a
-						class="bg-white bg-opacity-5"
+					<button
+						class="flex items-start justify-start w-full bg-white bg-opacity-5"
 						style="padding: 0; border-radius: 0px;"
-						href={`/main/chats/${item.id}?userId=${userId}`}
 						on:click={() => onChatClicked(item.id)}
 					>
 						<div
-							class={`flex   items-center  w-full p-4 ${
+							class={`flex items-center justify-start w-full p-3 ${
 								$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
-							} rounded-lg shadow `}
+							} rounded-lg shadow hover:bg-slate-400 hover:bg-opacity-10 `}
 						>
 							<!-- Lead: Avatar -->
 							<div class="flex-shrink-0">
@@ -171,9 +191,9 @@
 							</div>
 
 							<!-- Title and Subtitle -->
-							<div class="flex flex-col justify-start w-32 ml-4">
+							<div class="flex flex-col items-start justify-start ml-4">
 								<div class="text-sm font-semibold truncate">{item.title}</div>
-								<div class="overflow-hidden text-sm text-gray-500 truncate">
+								<div class="w-32 overflow-hidden text-sm text-gray-500 truncate">
 									{item.subTitle}
 								</div>
 							</div>
@@ -183,53 +203,53 @@
 								style="padding: 0; border-radius: 0px;"
 								class="ml-auto"
 								use:popup={popupFeatured}
+								on:click|stopPropagation
 							>
 								<div class="ml-auto text-sm text-gray-500">
 									<MoreHorizontal />
 								</div>
 							</button>
 						</div>
-						<!-- show popup -->
-						<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
-							<div class="space-y-2">
-								<button
-									class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
-								>
-									<Layers2 />
-									<div class="flex items-center p-2 rounded-lg">
-										<!-- Add your icon here -->
-										<span class="ml-2">Duplicate</span>
-									</div>
-								</button>
-								<button
-									on:click={() => {
-										console.log('Delete');
-									}}
-									class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
-								>
-									<Trash2 />
-									<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
-										<!-- Add your icon here -->
-										<span class="ml-2">Delete</span>
-									</div>
-								</button>
-							</div>
+					</button>
+					<!-- show popup -->
+					<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
+						<div class="space-y-2">
+							<button
+								class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+							>
+								<Layers2 />
+								<div class="flex items-center p-2 rounded-lg">
+									<!-- Add your icon here -->
+									<span class="ml-2">Duplicate</span>
+								</div>
+							</button>
+							<button
+								on:click={async () => {
+									await deleteChat(item.id);
+								}}
+								class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+							>
+								<Trash2 />
+								<div style="border-radius: 0px;" class="flex items-center p-2 rounded-lg">
+									<!-- Add your icon here -->
+									<span class="ml-2">Delete</span>
+								</div>
+							</button>
 						</div>
-					</a>
+					</div>
 				{/each}
 			</Collection>
 		{:else}
 			{#each find(chats, searchValue) as item (item.id)}
-				<a
-					class="bg-white bg-opacity-5"
+				<button
+					class="flex items-start justify-start w-full bg-white bg-opacity-5"
 					style="padding: 0; border-radius: 0px;"
-					href={`/main/chats/${item.id}?userId=${userId}`}
 					on:click={() => onChatClicked(item.id)}
 				>
 					<div
-						class={`flex items-center  w-full p-4 ${
+						class={`flex items-center justify-start w-full p-3 ${
 							$sharedVariable === item.id ? `bg-white bg-opacity-10` : ``
-						} rounded-lg shadow `}
+						} rounded-lg shadow hover:bg-slate-400 hover:bg-opacity-10 `}
 					>
 						<!-- Lead: Avatar -->
 						<div class="flex-shrink-0">
@@ -239,9 +259,9 @@
 						</div>
 
 						<!-- Title and Subtitle -->
-						<div class="w-32 ml-4">
+						<div class="flex flex-col items-start justify-start ml-4">
 							<div class="text-sm font-semibold truncate">{item.title}</div>
-							<div class="overflow-hidden text-sm text-gray-500 truncate">
+							<div class="w-32 overflow-hidden text-sm text-gray-500 truncate">
 								{item.subTitle}
 							</div>
 						</div>
@@ -251,13 +271,14 @@
 							style="padding: 0; border-radius: 0px;"
 							class="ml-auto"
 							use:popup={popupFeatured}
+							on:click|stopPropagation
 						>
 							<div class="ml-auto text-sm text-gray-500">
 								<MoreHorizontal />
 							</div>
 						</button>
 					</div>
-				</a>
+				</button>
 				<!-- show popup -->
 				<div class="p-1 shadow-xl card w-52" data-popup="popupFeatured">
 					<div class="space-y-2">
@@ -271,8 +292,8 @@
 							</div>
 						</button>
 						<button
-							on:click={() => {
-								console.log('Delete');
+							on:click={async () => {
+								await deleteChat(item.id);
 							}}
 							class="flex items-center w-full px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
 						>

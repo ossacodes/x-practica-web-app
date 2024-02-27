@@ -55,9 +55,9 @@
 			hasData = querySnapshot.docs.length > 0;
 
 			// Add delay
-			await new Promise(resolve => setTimeout(resolve, 600));
+			await new Promise((resolve) => setTimeout(resolve, 600));
 		} catch (error) {
-			console.error("Error fetching data: ", error);
+			console.error('Error fetching data: ', error);
 		} finally {
 			isPageLoading = false;
 		}
@@ -200,6 +200,57 @@
 {#if isPageLoading}
 	<LoadInput />
 {:else}
+	{#if data.length === 0 && $messages.length === 0 && !$isLoading}
+		<center>
+			<div class="grid items-end justify-center w-1/2 grid-flow-col grid-rows-2 gap-3 px-2 ">
+				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+					<div class="flex min-w-0 gap-x-4">
+						<div class="flex flex-col items-start min-w-0">
+							<p class="text-sm font-semibold leading-6 text-white">Give me a workout plan</p>
+							<p class="w-full mt-1 text-xs leading-5 text-gray-500 truncate">
+								Create a workout plan for resistance training
+							</p>
+						</div>
+					</div>
+				</div>
+				
+				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+					<div class="flex min-w-0 gap-x-4">
+						<div class="flex flex-col items-start min-w-0">
+							<p class="text-sm font-semibold leading-6 text-white">Fun Facts</p>
+							<p class="w-full mt-1 text-xs leading-5 text-gray-500 truncate">
+								Tell me a fun fact about the Golden State Warriors
+							</p>
+						</div>
+					</div>
+				</div>
+		
+
+				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+					<div class="flex min-w-0 gap-x-4">
+						<div class="flex flex-col items-start min-w-0">
+							<p class="text-sm font-semibold leading-6 text-white">Creativity Ideas</p>
+							<p class="w-full mt-1 text-xs leading-5 text-gray-500 truncate">
+								Brainstorm incentives for a customer loyalty program in a small bookstore
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+					<div class="flex min-w-0 gap-x-4">
+						<div class="flex flex-col items-start min-w-0">
+							<p class="text-sm font-semibold leading-6 text-white">Coding Flow</p>
+							<p class="w-full mt-1 text-xs leading-5 text-gray-500 truncate">
+								Show me a code snippet of a website's sticky header
+							</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</center>
+	{/if}
 	<form on:submit={handleSubmit}>
 		<div class="flex justify-center pt-2 pb-6">
 			<div

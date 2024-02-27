@@ -34,11 +34,11 @@
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
 	<!-- Router Slot -->
-	<svelte:fragment slot="sidebarLeft">
-		<div class="flex flex-col h-screen">
+	<!-- <svelte:fragment slot="sidebarLeft">
+		<div class="flex flex-col h-screen px-1 bg-black bg-opacity-30">
 			<Navigation userId={$user?.uid} />
 		</div>
-	</svelte:fragment>
+	</svelte:fragment> -->
 	<!-- <slot /> -->
 	<div class="flex flex-col h-screen">
 		<Appbar />

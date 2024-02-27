@@ -36,7 +36,7 @@
 	const user = userStore(auth);
 
 	// setContext('user', user);
-	
+
 	// if ($user?.uid != null) {
 	// 	console.log($user?.uid);
 	// }
@@ -51,7 +51,11 @@
 			<!-- <svelte:fragment slot="header">
 				<Appbar />
 			</svelte:fragment> -->
-
+			<svelte:fragment slot="sidebarLeft">
+				<div class="flex flex-col h-screen px-1 bg-black bg-opacity-30">
+					<Navigation userId={$user?.uid} />
+				</div>
+			</svelte:fragment>
 			<!-- Router Slot -->
 			<div class="w-full p-0">
 				<slot />

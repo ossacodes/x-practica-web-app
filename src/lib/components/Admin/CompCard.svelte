@@ -33,7 +33,7 @@
 	import matlab from 'highlight.js/lib/languages/matlab';
 	import powershell from 'highlight.js/lib/languages/powershell';
 	import yaml from 'highlight.js/lib/languages/yaml';
-
+	import coffeescript from 'highlight.js/lib/languages/coffeescript';
 	import { storeHighlightJs } from '@skeletonlabs/skeleton';
 
 	// Register each imported language module
@@ -64,6 +64,7 @@
 	hljs.registerLanguage('matlab', matlab);
 	hljs.registerLanguage('powershell', powershell);
 	hljs.registerLanguage('yaml', yaml);
+	hljs.registerLanguage('coffeescript', coffeescript);
 
 	storeHighlightJs.set(hljs);
 
@@ -92,7 +93,9 @@
 		// Replace new lines with paragraph breaks for normal text
 		formattedText = formattedText
 			.split(newLineRegex)
-			.map((paragraph) => (paragraph.trim() ? `<p style="text-align: justify;">${paragraph.trim()}</p>` : ''))
+			.map((paragraph) =>
+				paragraph.trim() ? `<p style="text-align: justify;">${paragraph.trim()}</p>` : ''
+			)
 			.join('');
 
 		return formattedText;
@@ -125,7 +128,11 @@
 
 {#each parts as part (part)}
 	{#if part.code}
-		<CodeBlock language={part.language} code={part.code}></CodeBlock>
+		{#if part.language === 'svelte'}
+			<CodeBlock language='javascript' code={part.code}></CodeBlock>
+		{:else}
+			<CodeBlock language={part.language} code={part.code}></CodeBlock>
+		{/if}
 	{:else if part.inlineCode}
 		<span class="px-0.5 bg-green-500 bg-opacity-20 text-green-400">{part.inlineCode}</span>
 	{:else}
@@ -161,4 +168,3 @@
 // 		{part.text}
 // 	{/if}
 // {/each} -->
-

@@ -12,19 +12,32 @@
 		type PopupSettings
 	} from '@skeletonlabs/skeleton';
 	import Navigation from '$lib/components/Admin/Navigation.svelte';
-	import { SignedIn } from 'sveltefire';
+	import { Doc, SignedIn } from 'sveltefire';
 	import { goto } from '$app/navigation';
 	import { CreditCard, Settings, LogOut } from 'lucide-svelte';
+	import { FirebaseApp, userStore } from 'sveltefire';
+	import { initializeApp } from 'firebase/app';
+	import { getAuth } from 'firebase/auth';
+	import firebaseConfig from '$lib/firebase/firebase.client';
+	import Modal from './Modal.svelte';
 
 	export let userId: any;
 
 	initializeStores();
+
+	const app = initializeApp(firebaseConfig);
+
+	const auth = getAuth(app);
+
+	const user = userStore(auth);
 
 	const drawerStore = getDrawerStore();
 
 	function openDrawer(): void {
 		drawerStore.open();
 	}
+
+	let showModal = false;
 
 	const popupProfile: PopupSettings = {
 		// Represents the type of event that opens/closed the popup
@@ -116,14 +129,16 @@
 		<div class="p-4 shadow-xl card w-52" data-popup="popupProfile">
 			<SignedIn let:signOut>
 				<div class="space-y-2">
-					<div class="flex min-w-0 gap-x-4">
-						<div class="flex-auto min-w-0">
-							<p class="text-lg font-semibold leading-6 text-white">Leslie Alexander</p>
-							<p class="mt-1 text-xs leading-5 text-gray-500 truncate">
-								leslie.alexander@example.com
-							</p>
+					<Doc ref={`users/${$user?.uid}`} let:data>
+						<div class="flex min-w-0 gap-x-4">
+							<div class="flex-auto min-w-0">
+								<p class="text-lg font-semibold leading-6 text-white">{data.username}</p>
+								<p class="mt-1 text-xs leading-5 text-gray-500 truncate">
+									{$user?.email}
+								</p>
+							</div>
 						</div>
-					</div>
+					</Doc>
 
 					<div class="h-[1px] bg-gray-600"></div>
 
@@ -136,11 +151,12 @@
 					</div>
 					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
 						<Settings />
-						<a href="/main/settings" class="flex items-center p-2 rounded-lg">
+						<a href="/main/chats/Settings" class="flex items-center p-2 rounded-lg">
 							<!-- Add your icon here -->
 							<span class="ml-2">Settings</span>
 						</a>
 					</div>
+
 					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
 						<LogOut />
 						<button

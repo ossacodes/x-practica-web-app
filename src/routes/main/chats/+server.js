@@ -26,24 +26,24 @@ export const POST = async ({ request }) => {
 	const combinedMessages = messageHistory.concat(messages);
 
 	// // Ask OpenAI for a streaming chat completion given the prompt
-	// const response = await openai.chat.completions.create({
-	// 	model: 'gpt-3.5-turbo',
-	// 	stream: true,
-	// 	messages: combinedMessages.map((/** @type {{ content: any; role: any; }} */ message) => ({
-	// 		content: message.content,
-	// 		role: message.role
-	// 	}))
-	// });
-
-    const response = await fireworks.chat.completions.create({
-		model: 'accounts/fireworks/models/yi-34b-200k-capybara',
+	const response = await openai.chat.completions.create({
+		model: 'gpt-3.5-turbo',
 		stream: true,
-		max_tokens: 2000,
-        messages: combinedMessages.map((/** @type {{ content: any; role: any; }} */ message) => ({
+		messages: combinedMessages.map((/** @type {{ content: any; role: any; }} */ message) => ({
 			content: message.content,
 			role: message.role
 		}))
 	});
+
+    // const response = await fireworks.chat.completions.create({
+	// 	model: 'accounts/fireworks/models/yi-34b-200k-capybara',
+	// 	stream: true,
+	// 	max_tokens: 2000,
+    //     messages: combinedMessages.map((/** @type {{ content: any; role: any; }} */ message) => ({
+	// 		content: message.content,
+	// 		role: message.role
+	// 	}))
+	// });
 
 	const chatsDocRef = db.collection('chats').doc(userId).collection(chatId);
 
