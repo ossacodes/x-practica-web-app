@@ -27,8 +27,12 @@
 	let messageHistory = [];
 	let aiChatId;
 	let isGenerating = true;
+	let messageId = '';
+	let messageContent = '';
 
-	const handleRightClick = (event) => {
+	const handleRightClick = (event, messagetID, message) => {
+		messageId = messagetID;
+		messageContent = message;
 		event.preventDefault();
 		position = { x: event.clientX, y: event.clientY };
 		showDropdown = true;
@@ -114,6 +118,10 @@
 			console.log('Dropped files:', files);
 		}
 	}
+
+	function closeDropdown() {
+        showDropdown = false;
+    }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -149,17 +157,17 @@
 							class={`flex mt-5 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
 						>
 							<div
-								on:contextmenu={handleRightClick}
+								on:contextmenu={(event) => handleRightClick(event, message.id, message.content)}
 								on:click={handleClickOutside}
 								class={`p-2 max-w-lg rounded-lg ${message.role === 'user' ? 'bg-blue-800 bg-opacity-30 text-white' : 'bg-gray-200 bg-opacity-5 text-gray'}`}
 							>
 								<CompCard {message} />
 							</div>
-							{#if showDropdown}
-								<Dropdown {items} {position} messageId={message.id} />
-							{/if}
 						</div>
 					{/each}
+					{#if showDropdown}
+						<Dropdown fetchData={fetchData} {items} {position} messageId={messageId} userId={userId} chatId={chatId} {closeDropdown} {messageContent} />
+					{/if}
 				</ul>
 			{:else}
 				<div></div>
@@ -202,8 +210,10 @@
 {:else}
 	{#if data.length === 0 && $messages.length === 0 && !$isLoading}
 		<center>
-			<div class="grid items-end justify-center w-1/2 grid-flow-col grid-rows-2 gap-3 px-2 ">
-				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+			<div class="grid items-end justify-center w-1/2 grid-flow-col grid-rows-2 gap-3 px-2">
+				<div
+					class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100"
+				>
 					<div class="flex min-w-0 gap-x-4">
 						<div class="flex flex-col items-start min-w-0">
 							<p class="text-sm font-semibold leading-6 text-white">Give me a workout plan</p>
@@ -213,8 +223,10 @@
 						</div>
 					</div>
 				</div>
-				
-				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+
+				<div
+					class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100"
+				>
 					<div class="flex min-w-0 gap-x-4">
 						<div class="flex flex-col items-start min-w-0">
 							<p class="text-sm font-semibold leading-6 text-white">Fun Facts</p>
@@ -224,9 +236,10 @@
 						</div>
 					</div>
 				</div>
-		
 
-				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+				<div
+					class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100"
+				>
 					<div class="flex min-w-0 gap-x-4">
 						<div class="flex flex-col items-start min-w-0">
 							<p class="text-sm font-semibold leading-6 text-white">Creativity Ideas</p>
@@ -237,7 +250,9 @@
 					</div>
 				</div>
 
-				<div class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100">
+				<div
+					class="flex items-center justify-start h-20 min-w-full px-5 border rounded-lg hover:bg-slate-400 hover:bg-opacity-10 bg-slate-500 bg-opacity-5 border-opacity-10 border-slate-100"
+				>
 					<div class="flex min-w-0 gap-x-4">
 						<div class="flex flex-col items-start min-w-0">
 							<p class="text-sm font-semibold leading-6 text-white">Coding Flow</p>
@@ -247,7 +262,6 @@
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</center>
 	{/if}

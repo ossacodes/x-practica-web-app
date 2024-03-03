@@ -1,5 +1,5 @@
 <div class="flex justify-center p-2">
-	<!-- <div
+	<div
 		class="flex items-center justify-center w-full pl-3 bg-white border border-slate-700 rounded-xl bg-opacity-5"
 	>
 		<svg width="20" height="20" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,5 +18,5 @@
 			type="text"
 			placeholder="Search..."
 		/>
-	</div> -->
+	</div>
 </div>

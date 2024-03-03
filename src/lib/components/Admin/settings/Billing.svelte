@@ -23,7 +23,7 @@
 			<div class="flex space-x-4">
 				<div class="flex-1">
 					<div class="p-4 border rounded-lg">
-						<h3 class="mb-2 text-lg font-semibold">Premium</h3>
+						<h3 class="mb-2 text-lg font-semibold">Life Time Plan</h3>
 						<p>
 							Premium members get
 							<span class="font-semibold text-green-500"> even more </span>
@@ -33,7 +33,7 @@
 				</div>
 				<div class="flex-1">
 					<div class="p-4 border rounded-lg">
-						<h3 class="mb-2 text-lg font-semibold">Elite</h3>
+						<h3 class="mb-2 text-lg font-semibold">Premium</h3>
 						<p>
 							Get premium economy, business, and first class deals.
 							<span class="font-semibold text-green-500"> Save an average of $2,000 </span>

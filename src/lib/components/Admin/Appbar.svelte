@@ -9,12 +9,13 @@
 		ListBox,
 		ListBoxItem,
 		popup,
+		SlideToggle,
 		type PopupSettings
 	} from '@skeletonlabs/skeleton';
 	import Navigation from '$lib/components/Admin/Navigation.svelte';
 	import { Doc, SignedIn } from 'sveltefire';
 	import { goto } from '$app/navigation';
-	import { CreditCard, Settings, LogOut } from 'lucide-svelte';
+	import { CreditCard, Settings, LogOut, Blocks, Globe, Image } from 'lucide-svelte';
 	import { FirebaseApp, userStore } from 'sveltefire';
 	import { initializeApp } from 'firebase/app';
 	import { getAuth } from 'firebase/auth';
@@ -44,6 +45,15 @@
 		event: 'click',
 		// Matches the data-popup value on your popup element
 		target: 'popupProfile',
+		// Defines which side of your trigger the popup will appear
+		placement: 'left'
+	};
+
+	const popupPlugins: PopupSettings = {
+		// Represents the type of event that opens/closed the popup
+		event: 'click',
+		// Matches the data-popup value on your popup element
+		target: 'popupPlugins',
 		// Defines which side of your trigger the popup will appear
 		placement: 'left'
 	};
@@ -121,6 +131,48 @@
 		</h1>
 	</div>
 	<svelte:fragment slot="trail">
+		<div class="relative inline-block">
+			<span class="absolute z-10 badge-icon variant-filled-warning -top-0 -right-0">2</span>
+			<button class="btn" use:popup={popupPlugins}>
+				<Blocks size="27" />
+			</button>
+		</div>
+
+		<div class="w-64 p-4 shadow-xl card" data-popup="popupPlugins">
+			<SignedIn let:signOut>
+				<div class="space-y-2">
+					<Doc ref={`users/${$user?.uid}`} let:data>
+						<div class="flex min-w-0 gap-x-4">
+							<div class="flex-auto min-w-0">
+								<p class="text-lg font-semibold leading-6 text-white">Enable plugins</p>
+							</div>
+						</div>
+					</Doc>
+
+					<div class="h-[1px] bg-gray-600"></div>
+
+					<div class="flex items-center px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200">
+						<Globe />
+
+						<a href="/main/billing" class="p-2 mr-auto rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Browsing</span>
+						</a>
+						<SlideToggle name="slider-large" checked active="bg-primary-500" size="sm" />
+					</div>
+					<div
+						class="flex items-center justify-between px-3 cursor-pointer hover:bg-opacity-5 hover:bg-gray-200"
+					>
+						<Image />
+						<a href="/main/chats/Settings" class="flex items-center p-2 mr-auto rounded-lg">
+							<!-- Add your icon here -->
+							<span class="ml-2">Image Gen</span>
+						</a>
+						<SlideToggle name="slider-large" checked active="bg-primary-500" size="sm" />
+					</div>
+				</div>
+			</SignedIn>
+		</div>
 		<LightSwitch />
 		<button class="btn" use:popup={popupProfile}>
 			<Avatar initials="JD" width="w-10" background="bg-primary-500" />

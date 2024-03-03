@@ -1,6 +1,8 @@
 <script>
 	import Account from '$lib/components/Admin/settings/Account.svelte';
+	import ApisSettings from '$lib/components/Admin/settings/ApisSettings.svelte';
 	import Billing from '$lib/components/Admin/settings/Billing.svelte';
+	import ChangePassword from '$lib/components/Admin/settings/ChangePassword.svelte';
 import { Tab, TabGroup } from '@skeletonlabs/skeleton';
 	let tabSet = 0;
 </script>
@@ -26,17 +28,19 @@ import { Tab, TabGroup } from '@skeletonlabs/skeleton';
 			</Tab>
 			<Tab bind:group={tabSet} name="tab2" value={1}>Password</Tab>
 			<Tab bind:group={tabSet} name="tab3" value={2}>Plan & Billing</Tab>
-            <Tab bind:group={tabSet} name="tab3" value={3}>APIs</Tab>
-			<Tab bind:group={tabSet} name="tab3" value={4}>Appearance</Tab>
+            <Tab bind:group={tabSet} name="tab4" value={3}>APIs</Tab>
+			<Tab bind:group={tabSet} name="tab5" value={4}>Appearance</Tab>
 
 			<!-- Tab Panels --->
 			<svelte:fragment slot="panel">
 				{#if tabSet === 0}
 					<Account />
 				{:else if tabSet === 1}
-					(tab panel 2 contents)
+					<ChangePassword />
 				{:else if tabSet === 2}
 					<Billing />
+                {:else if tabSet === 3}
+                    <ApisSettings />
 				{/if}
 			</svelte:fragment>
 		</TabGroup>
