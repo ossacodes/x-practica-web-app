@@ -4,6 +4,7 @@
 	import { CodeBlock } from '@skeletonlabs/skeleton';
 	import hljs from 'highlight.js/lib/core';
 	import 'highlight.js/styles/github-dark.css';
+	import { marked, parse } from "marked";
 
 	// Import each language module you require
 	import xml from 'highlight.js/lib/languages/xml'; // for HTML
@@ -129,7 +130,7 @@
 {#each parts as part (part)}
 	{#if part.code}
 		{#if part.language === 'svelte'}
-			<CodeBlock language='javascript' code={part.code}></CodeBlock>
+			<CodeBlock language="javascript" code={part.code}></CodeBlock>
 		{:else}
 			<CodeBlock language={part.language} code={part.code}></CodeBlock>
 		{/if}
@@ -137,7 +138,7 @@
 		<span class="px-0.5 bg-green-500 bg-opacity-20 text-green-400">{part.inlineCode}</span>
 	{:else}
 		<!-- {@html formatText(part.text)} -->
-		{@html part.text}
+		{@html marked(part.text)}
 	{/if}
 {/each}
 

@@ -5,7 +5,7 @@
 
 <AppShell slotSidebarLeft="w-0 md:w-14 bg-surface-100/10">
 	<!-- (header) -->
-	<svelte:fragment slot="sidebarLeft">
+	<!-- <svelte:fragment slot="sidebarLeft">
 		<div class="flex flex-col items-center justify-start h-screen space-y-10">
 			<div class="h-10"></div>
 			<button on:click={() => (selectedButton = 'button1')}>
@@ -223,7 +223,7 @@
 				/>
 			</svg>
 		</div>
-	</svelte:fragment>
+	</svelte:fragment> -->
 	<!-- (sidebarRight) -->
 	<!-- (pageHeader) -->
 	<!-- Router Slot -->

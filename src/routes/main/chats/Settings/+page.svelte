@@ -3,8 +3,30 @@
 	import ApisSettings from '$lib/components/Admin/settings/ApisSettings.svelte';
 	import Billing from '$lib/components/Admin/settings/Billing.svelte';
 	import ChangePassword from '$lib/components/Admin/settings/ChangePassword.svelte';
-import { Tab, TabGroup } from '@skeletonlabs/skeleton';
+	import { Tab, TabGroup } from '@skeletonlabs/skeleton';
 	let tabSet = 0;
+	import { Collection, userStore } from 'sveltefire';
+	import {
+		getFirestore,
+		collection,
+		setDoc,
+		deleteDoc,
+		doc,
+		getDocs,
+		query,
+		orderBy,
+		where
+	} from 'firebase/firestore';
+	import { initializeApp } from 'firebase/app';
+	import firebaseConfig from '$lib/firebase/firebase.client';
+	import { getAuth } from 'firebase/auth';
+
+	const app = initializeApp(firebaseConfig);
+	const firestore = getFirestore(app);
+
+	const auth = getAuth(app);
+
+	const user = userStore(auth);
 </script>
 
 <div class="flex flex-col h-screen">
@@ -28,8 +50,7 @@ import { Tab, TabGroup } from '@skeletonlabs/skeleton';
 			</Tab>
 			<Tab bind:group={tabSet} name="tab2" value={1}>Password</Tab>
 			<Tab bind:group={tabSet} name="tab3" value={2}>Plan & Billing</Tab>
-            <Tab bind:group={tabSet} name="tab4" value={3}>APIs</Tab>
-			<Tab bind:group={tabSet} name="tab5" value={4}>Appearance</Tab>
+			<Tab bind:group={tabSet} name="tab4" value={3}>APIs</Tab>
 
 			<!-- Tab Panels --->
 			<svelte:fragment slot="panel">
@@ -39,12 +60,10 @@ import { Tab, TabGroup } from '@skeletonlabs/skeleton';
 					<ChangePassword />
 				{:else if tabSet === 2}
 					<Billing />
-                {:else if tabSet === 3}
-                    <ApisSettings />
+				{:else if tabSet === 3}
+					<ApisSettings userId={$user?.uid} />
 				{/if}
 			</svelte:fragment>
 		</TabGroup>
-
-		
 	</div>
 </div>
